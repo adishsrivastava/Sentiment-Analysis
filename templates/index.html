@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+        content="Interactive RNN sentiment analysis using a SimpleRNN trained on IMDb movie reviews.">
+
+    <title>Sentiment — RNN Sentiment Analysis</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar" id="sidebar">
+
+            <div class="brand">
+                <div class="brand-icon">S</div>
+
+                <div>
+                    <strong>Sentiment</strong>
+                    <span>RNN Lab</span>
+                </div>
+            </div>
+
+
+            <button class="new-analysis" onclick="newAnalysis()">
+                <span>＋</span>
+                New analysis
+            </button>
+
+
+            <div class="sidebar-section">
+
+                <p class="sidebar-label">
+                    RECENT
+                </p>
+
+                <div id="historyList" class="history-list">
+
+                    <p class="history-empty">
+                        No analyses yet.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-bottom">
+
+                <button class="sidebar-item" onclick="openModelModal()">
+                    <span>ⓘ</span>
+                    About the model
+                </button>
+
+
+                <a class="sidebar-item" href="YOUR_GITHUB_URL" target="_blank" rel="noopener noreferrer">
+                    <span>↗</span>
+                    GitHub
+                </a>
+
+
+                <div class="theme-control">
+
+                    <button data-theme-option="light" title="Light mode">
+                        ☀
+                    </button>
+
+                    <button data-theme-option="system" title="System theme">
+                        ◐
+                    </button>
+
+                    <button data-theme-option="dark" title="Dark mode">
+                        ☾
+                    </button>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= MAIN ================= -->
+
+        <main class="main">
+
+            <header class="mobile-header">
+
+                <button class="icon-button" onclick="toggleSidebar()">
+                    ☰
+                </button>
+
+                <strong>Sentiment</strong>
+
+                <button class="icon-button" onclick="cycleTheme()">
+                    ◐
+                </button>
+
+            </header>
+
+
+            <div class="content">
+
+                <!-- HERO -->
+
+                <section class="hero">
+
+                    <div class="eyebrow">
+                        SIMPLE RNN · SENTIMENT ANALYSIS
+                    </div>
+
+                    <h1>
+                        What does the model think?
+                    </h1>
+
+                    <p>
+                        Write a movie review or sentence and see
+                        how a recurrent neural network interprets
+                        its sentiment.
+                    </p>
+
+                </section>
+
+
+                <!-- INPUT -->
+
+                <section class="composer">
+
+                    <textarea id="textInput" maxlength="2000" placeholder="Write something..."
+                        oninput="updateCharacterCount()"></textarea>
+
+
+                    <div class="composer-footer">
+
+                        <span id="characterCount">
+                            0 / 2000
+                        </span>
+
+                        <button id="analyzeButton" class="primary-button" onclick="analyzeSentiment()">
+                            Analyze
+                            <kbd>Ctrl ↵</kbd>
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- EXAMPLES -->
+
+                <section class="examples-section">
+
+                    <div class="section-heading">
+
+                        <h2>Try an example</h2>
+
+                        <div class="example-tabs">
+
+                            <button class="example-tab active" data-category="simple">
+                                Simple
+                            </button>
+
+                            <button class="example-tab" data-category="sarcasm">
+                                Sarcasm
+                            </button>
+
+                            <button class="example-tab" data-category="mixed">
+                                Mixed
+                            </button>
+
+                            <button class="example-tab" data-category="negation">
+                                Negation
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="exampleCards" class="example-cards"></div>
+
+                </section>
+
+
+                <!-- RESULT -->
+
+                <section id="resultSection" class="result-section hidden">
+
+                    <div class="section-heading">
+
+                        <h2>Result</h2>
+
+                        <span id="confidenceBadge"></span>
+
+                    </div>
+
+
+                    <div class="result-card">
+
+                        <div class="prediction-header">
+
+                            <div id="sentimentIcon" class="sentiment-icon">
+                                🙂
+                            </div>
+
+                            <div>
+
+                                <p class="muted-label">
+                                    PREDICTION
+                                </p>
+
+                                <h3 id="sentiment">
+                                    Positive
+                                </h3>
+
+                                <p id="confidenceText"></p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="probability-section">
+
+                            <div class="probability-row">
+
+                                <div class="probability-label">
+
+                                    <span>Positive</span>
+
+                                    <span id="positiveValue">
+                                        0%
+                                    </span>
+
+                                </div>
+
+                                <div class="progress-track">
+
+                                    <div id="positiveBar" class="progress-fill positive"></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="probability-row">
+
+                                <div class="probability-label">
+
+                                    <span>Negative</span>
+
+                                    <span id="negativeValue">
+                                        0%
+                                    </span>
+
+                                </div>
+
+                                <div class="progress-track">
+
+                                    <div id="negativeBar" class="progress-fill negative"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- FEEDBACK -->
+
+                        <div class="feedback">
+
+                            <span>
+                                Was the model right?
+                            </span>
+
+                            <button onclick="submitFeedback(true)">
+                                👍 Yes
+                            </button>
+
+                            <button onclick="submitFeedback(false)">
+                                👎 No
+                            </button>
+
+                            <span id="feedbackMessage" class="feedback-message"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- HOW MODEL SEES TEXT -->
+
+                    <details class="explanation">
+
+                        <summary>
+                            How the model sees your text
+                        </summary>
+
+
+                        <div class="explanation-content">
+
+                            <div class="explanation-block">
+
+                                <span class="muted-label">
+                                    ORIGINAL
+                                </span>
+
+                                <p id="originalText"></p>
+
+                            </div>
+
+
+                            <div class="explanation-block">
+
+                                <span class="muted-label">
+                                    CLEANED
+                                </span>
+
+                                <p id="cleanedText"></p>
+
+                            </div>
+
+
+                            <div class="explanation-block">
+
+                                <span class="muted-label">
+                                    TOKENS
+                                </span>
+
+                                <div id="tokenList" class="token-list"></div>
+
+                            </div>
+
+
+                            <div class="sequence-info">
+
+                                <span id="tokenCount"></span>
+
+                                <span>
+                                    Padded to 200 tokens
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </details>
+
+                </section>
+
+
+                <!-- CHALLENGE -->
+
+                <section class="challenge-card">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            CHALLENGE THE RNN
+                        </span>
+
+                        <h2>
+                            Think you can fool it?
+                        </h2>
+
+                        <p>
+                            Try sarcasm, double negatives or mixed
+                            opinions and see whether the model gets
+                            confused.
+                        </p>
+
+                    </div>
+
+                    <button class="secondary-button" onclick="startChallenge()">
+                        Give me a challenge →
+                    </button>
+
+                </section>
+
+
+                <!-- FOOTER -->
+
+                <footer>
+
+                    <span>
+                        Built with SimpleRNN · TensorFlow · Flask
+                    </span>
+
+                    <span>
+                        Trained on IMDb movie reviews
+                    </span>
+
+                </footer>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- ================= MODEL MODAL ================= -->
+
+    <div id="modelModal" class="modal-backdrop hidden" onclick="closeModelModal(event)">
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        MODEL CARD
+                    </span>
+
+                    <h2>About this model</h2>
+
+                </div>
+
+                <button class="icon-button" onclick="closeModelModal()">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="model-grid">
+
+                <div>
+                    <span>Architecture</span>
+                    <strong>SimpleRNN</strong>
+                </div>
+
+                <div>
+                    <span>Dataset</span>
+                    <strong>IMDb Reviews</strong>
+                </div>
+
+                <div>
+                    <span>Vocabulary</span>
+                    <strong>10,000 words</strong>
+                </div>
+
+                <div>
+                    <span>Sequence</span>
+                    <strong>200 tokens</strong>
+                </div>
+
+            </div>
+
+
+            <div class="architecture">
+
+                <div>Embedding</div>
+                <span>↓</span>
+                <div>SimpleRNN · 64</div>
+                <span>↓</span>
+                <div>Dropout</div>
+                <span>↓</span>
+                <div>Dense · 32 · ReLU</div>
+                <span>↓</span>
+                <div>Sigmoid</div>
+
+            </div>
+
+
+            <div class="limitations">
+
+                <h3>Limitations</h3>
+
+                <ul>
+                    <li>
+                        Trained primarily on movie reviews.
+                    </li>
+
+                    <li>
+                        Only predicts positive or negative sentiment.
+                    </li>
+
+                    <li>
+                        Sarcasm can confuse the model.
+                    </li>
+
+                    <li>
+                        Mixed sentiment is reduced to one label.
+                    </li>
+
+                    <li>
+                        This is an educational model, not a
+                        general-purpose language understanding system.
+                    </li>
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
