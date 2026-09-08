@@ -123,6 +123,18 @@ def predict_sentiment(text):
         sentiment = "Negative"
         confidence = 1 - probability
 
+        # Get token information for "How the model sees your text"
+    token_ids = sequence[0]
+    index_word = tokenizer.index_word
+
+    tokens = [
+        {
+            "word": index_word.get(token_id, "<OOV>"),
+            "id": token_id
+        }
+        for token_id in token_ids[:50]
+    ]
+
 
     # Convert tokens back to words for visualization
 token_ids = sequence[0]
