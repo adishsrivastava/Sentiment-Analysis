@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this project in academic work, please cite it."
+title: "Sentiment: An Interactive RNN Sentiment Analysis Playground"
+authors:
+  - family-names: "Srivastava"
+    given-names: "Adish"
+repository-code: "https://github.com/adishsrivastava/RNN-Sentiment-Analysis"
+type: software
