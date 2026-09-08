@@ -149,21 +149,20 @@ tokens = [
     for token_id in token_ids[:50]
 ]
 
-return {
-    "sentiment": sentiment,
-    "confidence": round(confidence * 100, 2),
-    "positive_probability": round(probability * 100, 2),
-    "negative_probability": round((1 - probability) * 100, 2),
+    return {
+        "sentiment": sentiment,
+        "confidence": round(confidence * 100, 2),
+        "positive_probability": round(probability * 100, 2),
+        "negative_probability": round((1 - probability) * 100, 2),
 
-    # Explainability information
-    "analysis": {
-        "original": text,
-        "cleaned": cleaned,
-        "tokens": tokens,
-        "token_count": len(token_ids),
-        "sequence_length": MAX_LENGTH
+        "analysis": {
+            "original": text,
+            "cleaned": cleaned,
+            "tokens": tokens,
+            "token_count": len(token_ids),
+            "sequence_length": MAX_LENGTH
+        }
     }
-}
 
 
 # --------------------------------------------------
