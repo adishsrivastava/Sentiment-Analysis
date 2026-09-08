@@ -531,7 +531,7 @@ function saveHistory(text, data) {
     );
 
 
-    renderHistory();
+    renderHistory(); 
 }
 
 
