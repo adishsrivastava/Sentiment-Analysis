@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RNN Sentiment Analyzer</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+
+<body>
+
+    <main class="container">
+
+        <div class="badge">
+            RECURRENT NEURAL NETWORK
+        </div>
+
+        <h1>
+            Sentiment Analyzer
+        </h1>
+
+        <p class="subtitle">
+            Enter a sentence or movie review and let a
+            trained RNN determine its sentiment.
+        </p>
+
+
+        <div class="card">
+
+            <textarea id="textInput" placeholder="Type something here..." maxlength="2000"></textarea>
+
+
+            <div class="examples">
+
+                <button onclick="setExample(
+                    'This movie was absolutely fantastic and I loved every minute of it.'
+                )">
+                    Positive example
+                </button>
+
+                <button onclick="setExample(
+                    'This movie was terrible, boring and a complete waste of time.'
+                )">
+                    Negative example
+                </button>
+
+            </div>
+
+
+            <button class="analyze" onclick="analyzeSentiment()">
+                Analyze Sentiment
+            </button>
+
+
+            <div id="result" class="result hidden">
+
+                <p class="result-label">
+                    PREDICTION
+                </p>
+
+                <h2 id="sentiment"></h2>
+
+                <p id="confidence"></p>
+
+
+                <div class="probabilities">
+
+                    <div>
+                        Positive
+                        <span id="positive"></span>
+                    </div>
+
+                    <div>
+                        Negative
+                        <span id="negative"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <p class="footer">
+            Built using TensorFlow • Keras • SimpleRNN • Flask
+        </p>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>

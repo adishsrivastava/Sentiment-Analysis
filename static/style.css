@@ -1,0 +1,172 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b0d12;
+    color: #ffffff;
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 760px;
+    text-align: center;
+}
+
+.badge {
+    display: inline-block;
+
+    padding: 8px 14px;
+    border: 1px solid #30343b;
+    border-radius: 20px;
+
+    color: #a7adb8;
+
+    font-size: 12px;
+    letter-spacing: 1.5px;
+}
+
+h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #a7adb8;
+    line-height: 1.6;
+
+    max-width: 600px;
+    margin: 0 auto 35px;
+}
+
+.card {
+    background: #14171d;
+
+    border: 1px solid #282c34;
+    border-radius: 16px;
+
+    padding: 28px;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+
+    resize: vertical;
+
+    padding: 18px;
+
+    background: #0d1015;
+    color: white;
+
+    border: 1px solid #30343b;
+    border-radius: 10px;
+
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #777f8c;
+}
+
+.examples {
+    display: flex;
+    gap: 10px;
+
+    margin: 15px 0 25px;
+}
+
+.examples button {
+    background: transparent;
+    color: #a7adb8;
+
+    border: 1px solid #30343b;
+    border-radius: 8px;
+
+    padding: 8px 12px;
+
+    cursor: pointer;
+}
+
+.analyze {
+    width: 100%;
+
+    padding: 15px;
+
+    border: none;
+    border-radius: 9px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    background: white;
+    color: black;
+}
+
+.analyze:hover {
+    opacity: 0.9;
+}
+
+.result {
+    margin-top: 25px;
+
+    border-top: 1px solid #30343b;
+
+    padding-top: 25px;
+}
+
+.result-label {
+    color: #777f8c;
+
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+#sentiment {
+    font-size: 32px;
+    margin: 8px;
+}
+
+#confidence {
+    color: #a7adb8;
+}
+
+.probabilities {
+    margin-top: 20px;
+
+    display: flex;
+    justify-content: space-around;
+
+    color: #a7adb8;
+}
+
+.probabilities span {
+    display: block;
+
+    color: white;
+    font-size: 22px;
+    margin-top: 6px;
+}
+
+.hidden {
+    display: none;
+}
+
+.footer {
+    margin-top: 25px;
+
+    color: #656b75;
+    font-size: 13px;
+}
