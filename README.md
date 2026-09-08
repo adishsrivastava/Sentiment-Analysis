@@ -1,4 +1,4 @@
-# Sentiment
+# Sentiment Analyzer
 
 A small sentiment analysis playground built around a recurrent neural network.
 
