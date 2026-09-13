@@ -1,399 +1,231 @@
-# Sentiment Analyzer
+# RNN Sentiment Analyzer — Initial Iteration
 
-A small sentiment analysis playground built around a recurrent neural network.
+This branch preserves the original version of my sentiment-analysis project.
 
-I originally built this as part of a Deep Learning lab experiment to understand how RNNs work with sequential data. Instead of stopping at the notebook, I trained the model on IMDb movie reviews, saved it, built a Flask application around it, and deployed the whole thing as an interactive web app.
+The project began as a Deep Learning experiment using a **Simple Recurrent Neural Network (SimpleRNN)** for binary sentiment classification of IMDb movie reviews.
 
-The interesting part isn't just whether the model says **positive** or **negative**. The app also lets you see how the input is cleaned and tokenized, try sentences that are deliberately difficult for the model, and explore some of the limitations of a relatively simple RNN.
+After training the model, I turned it into a small Flask application where a user could enter text and receive a positive or negative sentiment prediction.
 
-**[Try the live app](https://sentiment-analysis-ten-omega.vercel.app)**
+This branch is intentionally preserved as a snapshot of that initial iteration.
 
----
-
-## What it does
-
-Type in a movie review or a sentence and the model returns:
-
-- a positive or negative prediction
-- the model's confidence
-- positive and negative probability scores
-- the cleaned version of the input
-- the tokens and token IDs seen by the model
-
-There are also a few features built around experimenting with the model rather than just using it.
-
-### Challenge the RNN
-
-The app includes prompts designed to make the classifier's job harder. Try sarcasm, double negatives, conflicting opinions, or sentences where the literal words don't quite match the intended sentiment.
-
-For example:
-
-> Fantastic. Another two hours of my life I'll never get back.
-
-A human immediately understands the sarcasm. A small RNN may not.
-
-That's part of the fun.
-
-### Difficult examples
-
-The example library is split into:
-
-- **Simple** — straightforward positive and negative statements
-- **Sarcasm** — positive vocabulary with negative intent
-- **Mixed** — praise and criticism in the same sentence
-- **Negation** — sentences such as "I wouldn't say this movie was bad"
-
-These are useful for seeing where binary sentiment classification starts to become less straightforward.
-
-### How the model sees your text
-
-After making a prediction, the preprocessing pipeline can be expanded to show something roughly like:
-
-```text
-Original
-"This movie was absolutely amazing!"
-
-        ↓
-
-Cleaned
-"this movie was absolutely amazing"
-
-        ↓
-
-Tokens
-this      movie      was      absolutely      amazing
- 11         17        13          425            477
-
-        ↓
-
-Padded sequence (200 tokens)
-
-        ↓
-
-SimpleRNN
-
-        ↓
-
-Positive
-```
-
-The intention is to make the inference process a little less opaque.
+For the latest version of the project — including SimpleRNN, LSTM and GRU model comparison, Model Arena, diagnostic benchmarks and failure analysis — see the [`main`](../../tree/main) branch.
 
 ---
 
-## Model
+## What this version contains
 
-The classifier is a fairly small Keras model:
-
-```text
-Input text
-    │
-    ▼
-Tokenization
-    │
-    ▼
-Padding (200 tokens)
-    │
-    ▼
-Embedding
-    │
-    ▼
-SimpleRNN (64)
-    │
-    ▼
-Dropout
-    │
-    ▼
-Dense (32, ReLU)
-    │
-    ▼
-Dense (1, Sigmoid)
-    │
-    ▼
-Positive / Negative
-```
-
-| | |
-|---|---|
-| **Dataset** | IMDb movie reviews |
-| **Task** | Binary sentiment classification |
-| **Architecture** | SimpleRNN |
-| **Vocabulary size** | 10,000 |
-| **Maximum sequence length** | 200 |
-| **Output** | Positive / Negative |
-| **Framework** | TensorFlow / Keras |
-
-The model uses a sigmoid output, so values above `0.5` are classified as positive and values below `0.5` as negative.
-
----
-
-## Preprocessing
-
-The inference pipeline deliberately uses the same preprocessing that was used during training.
-
-Reviews are:
-
-1. converted to lowercase
-2. stripped of HTML
-3. stripped of URLs
-4. reduced to English letters and whitespace
-5. tokenized using the saved training vocabulary
-6. padded or truncated to 200 tokens
-
-Keeping the tokenizer is particularly important. Training a new tokenizer at inference time would assign different integer IDs to words and make the saved model effectively useless.
-
----
-
-## Tech stack
-
-The project is intentionally pretty small.
-
-**Model**
+The initial application uses:
 
 - Python
-- TensorFlow
-- Keras
+- TensorFlow / Keras
 - SimpleRNN
-
-**Backend**
-
 - Flask
-
-**Frontend**
-
 - HTML
 - CSS
-- Vanilla JavaScript
+- JavaScript
 
-**Deployment**
-
-- Vercel
-
-There is no frontend framework and no database. Prediction history, theme preference, and feedback are stored locally in the browser.
-
----
-
-## Running it locally
-
-Clone the repository:
-
-```bash
-git clone https://github.com/adishsrivastava/RNN-Sentiment-Analysis.git
-cd RNN-Sentiment-Analysis
-```
-
-Create a virtual environment:
-
-```bash
-python -m venv .venv
-```
-
-On Windows:
-
-```bash
-.venv\Scripts\activate
-```
-
-On macOS/Linux:
-
-```bash
-source .venv/bin/activate
-```
-
-Install the dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run Flask:
-
-```bash
-python app.py
-```
-
-Then open:
+The basic pipeline is:
 
 ```text
-http://127.0.0.1:5000
+User text
+    ↓
+Text cleaning
+    ↓
+Tokenizer
+    ↓
+Sequence conversion
+    ↓
+Padding
+    ↓
+SimpleRNN
+    ↓
+Sigmoid output
+    ↓
+Positive / Negative
 ```
-
-You can also check that the backend is alive at:
-
-```text
-http://127.0.0.1:5000/health
-```
-
----
-
-## API
-
-The frontend talks to a small Flask endpoint that can also be used directly.
-
-### `POST /predict`
-
-Request:
-
-```json
-{
-  "text": "I absolutely loved this movie."
-}
-```
-
-Example response:
-
-```json
-{
-  "sentiment": "Positive",
-  "confidence": 92.41,
-  "positive_probability": 92.41,
-  "negative_probability": 7.59,
-  "analysis": {
-    "original": "I absolutely loved this movie.",
-    "cleaned": "i absolutely loved this movie",
-    "tokens": [
-      {
-        "word": "i",
-        "id": 10
-      }
-    ],
-    "token_count": 5,
-    "sequence_length": 200
-  }
-}
-```
-
-The exact probabilities depend on the trained model.
 
 ---
 
 ## Project structure
 
+The exact structure may vary slightly depending on the commit, but the application follows this general layout:
+
 ```text
-RNN-Sentiment-Analysis/
+Sentiment-Analysis/
 │
 ├── model/
 │   ├── sentiment_rnn.keras
 │   └── tokenizer.pkl
 │
 ├── static/
-│   ├── script.js
-│   └── style.css
+│   ├── style.css
+│   └── script.js
 │
 ├── templates/
 │   └── index.html
 │
 ├── app.py
 ├── requirements.txt
-├── .gitignore
 └── README.md
 ```
 
-`sentiment_rnn.keras` contains the trained network, while `tokenizer.pkl` preserves the vocabulary learned from the training data.
-
 ---
 
-## Limitations
+# Running locally
 
-This model is deliberately not presented as a general-purpose sentiment system.
+## 1. Clone this branch
 
-It was trained on **IMDb movie reviews**, which means its training distribution is fairly specific. It also has only two possible outputs:
+To clone the initial iteration directly:
 
-```text
-Positive
-Negative
+```bash
+git clone --branch Initial-Iteration-RNN --single-branch https://github.com/adishsrivastava/Sentiment-Analysis.git
 ```
 
-There is no neutral or mixed class.
+Enter the project:
 
-That leads to some interesting failure cases.
+```bash
+cd Sentiment-Analysis
+```
 
-The model may struggle with:
+---
 
-- sarcasm
-- irony
-- double negatives
+## 2. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+### macOS / Linux
+
+```bash
+source .venv/bin/activate
+```
+
+---
+
+## 3. Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+TensorFlow is a fairly large dependency, so installation may take some time.
+
+---
+
+## 4. Run the Flask application
+
+```bash
+python app.py
+```
+
+The terminal should show a local Flask address, normally:
+
+```text
+http://127.0.0.1:5000
+```
+
+Open that address in your browser.
+
+---
+
+## 5. Stop the application
+
+Press:
+
+```text
+Ctrl + C
+```
+
+in the terminal.
+
+To leave the virtual environment:
+
+```bash
+deactivate
+```
+
+---
+
+# Deploying your own copy
+
+This branch can also be used as the starting point for your own deployment.
+
+## Vercel
+
+1. Fork this repository or import it into your own GitHub account.
+2. Create a new project in Vercel.
+3. Import the GitHub repository.
+4. Configure the project to deploy the `Initial-Iteration-RNN` branch.
+5. Make sure all files required by the Flask application and trained model are included.
+6. Install dependencies from `requirements.txt`.
+7. Deploy the project.
+
+### TensorFlow and Vercel
+
+TensorFlow creates a very large Python function bundle.
+
+If Vercel rejects the deployment because the function exceeds its normal bundle-size limit, the deployment may require Vercel's large-function support/configuration.
+
+This is a limitation worth keeping in mind if you are deploying this version yourself.
+
+You can also deploy the Flask application to another Python-compatible hosting provider if preferred.
+
+---
+
+# Model limitations
+
+This was an early educational experiment rather than a production sentiment-analysis system.
+
+The model:
+
+- performs binary positive/negative classification
+- has no neutral sentiment class
+- was trained primarily on IMDb movie-review language
+- may generalize poorly to unrelated domains
+- can struggle with negation
+- can struggle with sarcasm
+- should not be interpreted as genuinely understanding the text
+
+These limitations eventually became part of the motivation for expanding the project.
+
+---
+
+# Where the project went next
+
+The current version on [`main`](../../tree/main) evolved this experiment into **Sentiment Lab**.
+
+Instead of relying on a single SimpleRNN, the newer project compares:
+
+```text
+SimpleRNN
+    vs
+LSTM
+    vs
+GRU
+```
+
+under controlled training conditions.
+
+It also includes diagnostic testing for:
+
+- simple sentiment
 - mixed sentiment
-- neutral statements
-- subtle contextual meaning
-- language that differs significantly from IMDb-style reviews
+- negation
+- sarcasm
 
-For example:
+along with model disagreement analysis, Model Arena and a Hall of Shame for examples that fool all three architectures.
 
-> The cinematography was beautiful, but everything else was terrible.
-
-contains both positive and negative sentiment, but the model is forced to reduce it to a single label.
-
-Similarly:
-
-> Great. Exactly what I needed today.
-
-could be sincere or sarcastic depending on context that the model simply doesn't have.
-
-These aren't bugs in the web application; they're useful demonstrations of the limits of the model and the task it was trained for.
-
----
-
-## Why a SimpleRNN?
-
-Mostly because that was the point of the experiment.
-
-There are much stronger approaches to sentiment analysis today. The goal here wasn't to build the best sentiment classifier available; it was to build, train, deploy, and understand a recurrent neural network end to end.
-
-That also gives this project somewhere interesting to go next.
-
----
-
-## Roadmap
-
-The next major version will turn the project into more of a recurrent-network comparison lab.
-
-- [x] Train a SimpleRNN sentiment classifier
-- [x] Build a Flask inference API
-- [x] Deploy the trained model
-- [x] Add light, dark and system themes
-- [x] Add prediction confidence visualization
-- [x] Show preprocessing and tokenization
-- [x] Add difficult sentiment examples
-- [x] Add Challenge the RNN mode
-- [x] Add local prediction history
-- [ ] Train an LSTM classifier
-- [ ] Train a GRU classifier
-- [ ] Compare RNN, LSTM and GRU predictions side by side
-- [ ] Compare accuracy, parameter count and inference time
-- [ ] Collect interesting failure cases into a "Hall of Shame"
-- [ ] Add a small transformer baseline
-
-The eventual goal is to make it possible to enter one sentence and watch several sequence models disagree with each other.
-
----
-
-## Contributing
-
-This started as a learning project, but contributions are welcome.
-
-Some relatively approachable areas to contribute to are:
-
-- adding interesting challenge prompts
-- finding reproducible model failure cases
-- improving accessibility
-- improving the mobile interface
-- adding tests
-- improving model visualizations
-- experimenting with other recurrent architectures
-
-If you're making a larger change, opening an issue first is probably the easiest way to discuss it.
-
----
-
-## Acknowledgements
-
-The model was trained using the IMDb movie review dataset and built with TensorFlow/Keras.
-
-The interface takes inspiration from the restrained, content-first design of tools such as Notion, while being implemented from scratch for this project.
+This branch remains unchanged so the progression from the original experiment to the current project can be inspected directly.
 
 ---
 
 ## License
 
-This project is open source. See [`LICENSE`](LICENSE) for details.
+This project is released under the [MIT License](LICENSE).
