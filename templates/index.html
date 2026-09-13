@@ -376,10 +376,11 @@
 
             </div>
 
-
             <div class="arena-note">
 
-                <strong>80 examples</strong>
+                <strong id="benchmark-total">
+                    80 examples
+                </strong>
 
                 <span>·</span>
 
@@ -387,14 +388,17 @@
 
                 <span>·</span>
 
-                balanced positive / negative labels
+                balanced labels
 
                 <span>·</span>
 
-                not used for training
+                never used for training
 
             </div>
 
+            <!-- =====================================================
+     BENCHMARK TABLE
+====================================================== -->
 
             <div class="benchmark-table-wrapper">
 
@@ -411,61 +415,12 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="benchmark-body">
 
                         <tr>
-                            <td>
-                                <strong>Simple</strong>
-                                <small>
-                                    Direct sentiment
-                                </small>
+                            <td colspan="4">
+                                Loading benchmark...
                             </td>
-
-                            <td>90%</td>
-                            <td class="best-cell">100%</td>
-                            <td class="best-cell">100%</td>
-                        </tr>
-
-
-                        <tr>
-                            <td>
-                                <strong>Mixed</strong>
-                                <small>
-                                    Conflicting sentiment
-                                </small>
-                            </td>
-
-                            <td>70%</td>
-                            <td>70%</td>
-                            <td class="best-cell">90%</td>
-                        </tr>
-
-
-                        <tr>
-                            <td>
-                                <strong>Negation</strong>
-                                <small>
-                                    Not bad / not good
-                                </small>
-                            </td>
-
-                            <td>25%</td>
-                            <td class="best-cell">35%</td>
-                            <td>25%</td>
-                        </tr>
-
-
-                        <tr>
-                            <td>
-                                <strong>Sarcasm</strong>
-                                <small>
-                                    Surface meaning reversal
-                                </small>
-                            </td>
-
-                            <td>35%</td>
-                            <td class="best-cell">50%</td>
-                            <td>35%</td>
                         </tr>
 
                     </tbody>
@@ -474,98 +429,78 @@
 
             </div>
 
+            <p class="benchmark-hint">
+                Select a category to inspect the individual examples.
+            </p>
 
-            <div class="insight-grid">
+            <!-- =====================================================
+     EXAMPLE EXPLORER
+====================================================== -->
 
-                <article class="insight-card">
+            <section class="arena-browser">
 
-                    <span class="insight-number">
-                        87.08%
+                <div class="arena-browser-header">
+
+                    <div>
+
+                        <div class="section-label">
+                            CHALLENGE EXPLORER
+                        </div>
+
+                        <h2 id="arena-category-title">
+                            Simple
+                        </h2>
+
+                    </div>
+
+                    <button id="random-challenge-button" class="secondary-button">
+                        ↻ Random challenge
+                    </button>
+
+                </div>
+
+                <div id="arena-example" class="arena-example"></div>
+
+                <div class="arena-controls">
+
+                    <button id="arena-previous" class="secondary-button">
+                        ← Previous
+                    </button>
+
+                    <span id="arena-position">
+                        1 / 20
                     </span>
 
-                    <h3>
-                        GRU wins overall
-                    </h3>
+                    <button id="arena-next" class="secondary-button">
+                        Next →
+                    </button>
 
-                    <p>
-                        GRU achieved the highest accuracy on the
-                        9,917-review IMDb test set.
-                    </p>
+                </div>
 
-                </article>
+            </section>
 
+            <!-- =====================================================
+     HALL OF SHAME
+====================================================== -->
 
-                <article class="insight-card">
+            <section class="hall-section">
 
-                    <span class="insight-number">
-                        90%
-                    </span>
-
-                    <h3>
-                        GRU handles mixed sentiment
-                    </h3>
-
-                    <p>
-                        It substantially outperformed both other
-                        architectures on our mixed-sentiment set.
-                    </p>
-
-                </article>
-
-
-                <article class="insight-card danger">
-
-                    <span class="insight-number">
-                        25–35%
-                    </span>
-
-                    <h3>
-                        Negation breaks them
-                    </h3>
-
-                    <p>
-                        All three models performed below chance on
-                        the balanced negation challenge.
-                    </p>
-
-                </article>
-
-
-                <article class="insight-card danger">
-
-                    <span class="insight-number">
-                        35–50%
-                    </span>
-
-                    <h3>
-                        Sarcasm remains difficult
-                    </h3>
-
-                    <p>
-                        Better general IMDb accuracy did not translate
-                        into reliable sarcasm recognition.
-                    </p>
-
-                </article>
-
-            </div>
-
-
-            <div class="arena-explanation">
+                <div class="section-label">
+                    HALL OF SHAME
+                </div>
 
                 <h2>
-                    Why this matters
+                    They all got these wrong.
                 </h2>
 
-                <p>
-                    A model can score well on its standard test set
-                    while failing badly on a narrow linguistic
-                    phenomenon. The challenge set is intentionally
-                    small and diagnostic, so these numbers should not
-                    be treated as a general benchmark.
+                <p class="section-description">
+                    Examples where SimpleRNN, LSTM and GRU all predicted
+                    the wrong sentiment.
                 </p>
 
-            </div>
+                <div id="hall-of-shame" class="hall-grid"></div>
+
+            </section>
 
         </section>
 
