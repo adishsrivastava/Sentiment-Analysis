@@ -1257,3 +1257,368 @@ a {
     }
 
 }
+
+
+/* ============================================================
+   V3.1 — MODEL ARENA
+============================================================ */
+
+.benchmark-hint {
+    margin: 9px 2px 0;
+
+    color: var(--text-tertiary);
+    font-size: 11px;
+}
+
+.benchmark-table tbody tr {
+    cursor: pointer;
+
+    transition:
+        background 0.12s ease;
+}
+
+.benchmark-table tbody tr:hover {
+    background: var(--surface-soft);
+}
+
+.benchmark-table tbody tr.selected {
+    background: var(--accent-soft);
+}
+
+.arena-browser {
+    margin-top: 34px;
+}
+
+.arena-browser-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-bottom: 12px;
+}
+
+.arena-browser-header h2 {
+    margin: 4px 0 0;
+
+    font-size: 20px;
+}
+
+.secondary-button {
+    padding: 7px 11px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    background: var(--surface);
+    color: var(--text-secondary);
+
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    background: var(--surface-soft);
+    color: var(--text);
+}
+
+.arena-example {
+    padding: 22px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow);
+}
+
+.challenge-category {
+    display: inline-block;
+
+    margin-bottom: 13px;
+    padding: 3px 7px;
+
+    border-radius: 5px;
+
+    background: var(--surface-soft);
+    color: var(--text-tertiary);
+
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.09em;
+
+    text-transform: uppercase;
+}
+
+.challenge-text {
+    margin: 0;
+
+    font-size: 19px;
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+}
+
+.challenge-actual {
+    margin-top: 16px;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.challenge-actual strong.positive {
+    color: var(--positive);
+}
+
+.challenge-actual strong.negative {
+    color: var(--negative);
+}
+
+.challenge-models {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 8px;
+
+    margin-top: 18px;
+}
+
+.challenge-model {
+    padding: 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    background: var(--surface-soft);
+}
+
+.challenge-model-name {
+    color: var(--text-tertiary);
+
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.challenge-model-result {
+    margin-top: 5px;
+
+    font-weight: 650;
+}
+
+.challenge-model-score {
+    margin-top: 3px;
+
+    color: var(--text-tertiary);
+    font-size: 10px;
+}
+
+.challenge-correct {
+    margin-top: 8px;
+
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.challenge-correct.yes {
+    color: var(--positive);
+}
+
+.challenge-correct.no {
+    color: var(--negative);
+}
+
+.challenge-actions {
+    margin-top: 18px;
+
+    padding-top: 14px;
+
+    border-top: 1px solid var(--border);
+}
+
+.arena-controls {
+    margin-top: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: var(--text-tertiary);
+    font-size: 11px;
+}
+
+/* ============================================================
+   HALL OF SHAME
+============================================================ */
+
+.hall-section {
+    margin-top: 52px;
+}
+
+.hall-section h2 {
+    margin: 5px 0 4px;
+
+    font-size: 22px;
+}
+
+.section-description {
+    margin: 0 0 16px;
+
+    color: var(--text-secondary);
+}
+
+.hall-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 9px;
+}
+
+.hall-card {
+    padding: 15px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    background: var(--surface);
+
+    cursor: pointer;
+
+    transition:
+        background 0.12s ease,
+        border-color 0.12s ease;
+}
+
+.hall-card:hover {
+    background: var(--surface-soft);
+    border-color: var(--border-strong);
+}
+
+.hall-category {
+    color: var(--negative);
+
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.09em;
+
+    text-transform: uppercase;
+}
+
+.hall-text {
+    margin-top: 7px;
+
+    color: var(--text-secondary);
+
+    line-height: 1.5;
+}
+
+.hall-actual {
+    margin-top: 10px;
+
+    color: var(--text-tertiary);
+    font-size: 10px;
+}
+
+/* ============================================================
+   MODEL EVOLUTION
+============================================================ */
+
+.evolution-section {
+    margin-top: 46px;
+}
+
+.evolution-section>h2 {
+    margin: 5px 0 22px;
+
+    font-size: 22px;
+}
+
+.evolution-timeline {
+    max-width: 700px;
+}
+
+.evolution-step {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+
+    gap: 15px;
+}
+
+.evolution-marker {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+
+    background: var(--surface);
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.evolution-step.current .evolution-marker {
+    border-color: var(--positive);
+
+    background: var(--positive-soft);
+    color: var(--positive);
+}
+
+.evolution-step h3 {
+    margin: 1px 0 4px;
+
+    font-size: 14px;
+}
+
+.evolution-step p {
+    max-width: 600px;
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.evolution-line {
+    width: 1px;
+    height: 28px;
+
+    margin:
+        5px 0 5px 21px;
+
+    background: var(--border-strong);
+}
+
+.version-link {
+    display: inline-block;
+
+    margin-top: 24px;
+
+    color: var(--text-secondary);
+
+    text-decoration: none;
+
+    font-size: 12px;
+}
+
+.version-link:hover {
+    color: var(--text);
+    text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+
+    .challenge-models,
+    .hall-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .arena-browser-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}

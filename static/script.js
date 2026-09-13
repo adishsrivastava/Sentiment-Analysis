@@ -1032,3 +1032,583 @@ textInput.addEventListener(
 initializeTheme();
 renderExamples();
 renderHistory();
+
+
+// ============================================================
+// V3.1 — MODEL ARENA
+// ============================================================
+
+let benchmarkData = null;
+
+let arenaCategory = "simple";
+let arenaIndex = 0;
+
+// ============================================================
+// LOAD BENCHMARK
+// ============================================================
+
+async function loadBenchmark() {
+
+    try {
+
+        const response =
+            await fetch("/benchmark");
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Could not load benchmark."
+            );
+
+        }
+
+        benchmarkData =
+            await response.json();
+
+        document.getElementById(
+            "benchmark-total"
+        ).textContent =
+            `${benchmarkData.total_examples} examples`;
+
+        renderBenchmarkTable();
+
+        renderArenaExample();
+
+        renderHallOfShame();
+
+    } catch (error) {
+
+        console.error(
+            "Benchmark error:",
+            error
+        );
+
+    }
+
+}
+
+// ============================================================
+// BENCHMARK TABLE
+// ============================================================
+
+function renderBenchmarkTable() {
+
+    const body =
+        document.getElementById(
+            "benchmark-body"
+        );
+
+    const categories = [
+        ["simple", "Simple", "Direct sentiment"],
+        ["mixed", "Mixed", "Conflicting sentiment"],
+        ["negation", "Negation", "Not bad / not good"],
+        ["sarcasm", "Sarcasm", "Surface meaning reversal"]
+    ];
+
+    body.innerHTML = "";
+
+    categories.forEach(
+        ([
+            key,
+            title,
+            description
+        ]) => {
+
+            const scores =
+                benchmarkData.summary[key];
+
+            const values = [
+                scores.simple_rnn,
+                scores.lstm,
+                scores.gru
+            ];
+
+            const best =
+                Math.max(...values);
+
+            const row =
+                document.createElement("tr");
+
+            if (key === arenaCategory) {
+
+                row.classList.add(
+                    "selected"
+                );
+
+            }
+
+            row.innerHTML = `
+
+                <td>
+
+                    <strong>
+                        ${title}
+                    </strong>
+
+                    <small>
+                        ${description}
+                    </small>
+
+                </td>
+
+                <td
+                    class="${
+                        scores.simple_rnn === best
+                            ? "best-cell"
+                            : ""
+                    }"
+                >
+                    ${scores.simple_rnn.toFixed(0)}%
+                </td>
+
+                <td
+                    class="${
+                        scores.lstm === best
+                            ? "best-cell"
+                            : ""
+                    }"
+                >
+                    ${scores.lstm.toFixed(0)}%
+                </td>
+
+                <td
+                    class="${
+                        scores.gru === best
+                            ? "best-cell"
+                            : ""
+                    }"
+                >
+                    ${scores.gru.toFixed(0)}%
+                </td>
+
+            `;
+
+            row.addEventListener(
+                "click",
+                () => {
+
+                    arenaCategory =
+                        key;
+
+                    arenaIndex =
+                        0;
+
+                    renderBenchmarkTable();
+
+                    renderArenaExample();
+
+                }
+            );
+
+            body.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+// ============================================================
+// GET CURRENT CATEGORY EXAMPLES
+// ============================================================
+
+function getArenaExamples() {
+
+    if (!benchmarkData) {
+        return [];
+    }
+
+    return benchmarkData.examples.filter(
+        item =>
+            item.category === arenaCategory
+    );
+
+}
+
+// ============================================================
+// MODEL CHALLENGE CARD
+// ============================================================
+
+function challengeModelCard(
+    name,
+    result
+) {
+
+    const correctness =
+        result.correct
+            ? "✓ Correct"
+            : "✗ Wrong";
+
+    return `
+
+        <div class="challenge-model">
+
+            <div class="challenge-model-name">
+                ${name}
+            </div>
+
+            <div class="challenge-model-result">
+
+                ${result.sentiment}
+
+            </div>
+
+            <div class="challenge-model-score">
+
+                ${result.score.toFixed(2)}%
+                positive score
+
+            </div>
+
+            <div
+                class="
+                    challenge-correct
+                    ${result.correct
+                        ? "yes"
+                        : "no"
+                    }
+                "
+            >
+
+                ${correctness}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+// ============================================================
+// RENDER CHALLENGE
+// ============================================================
+
+function renderArenaExample() {
+
+    if (!benchmarkData) {
+        return;
+    }
+
+    const examples =
+        getArenaExamples();
+
+    if (!examples.length) {
+        return;
+    }
+
+    if (arenaIndex >= examples.length) {
+
+        arenaIndex =
+            0;
+
+    }
+
+    if (arenaIndex < 0) {
+
+        arenaIndex =
+            examples.length - 1;
+
+    }
+
+    const item =
+        examples[arenaIndex];
+
+    const actualClass =
+        item.actual_sentiment.toLowerCase();
+
+    document.getElementById(
+        "arena-category-title"
+    ).textContent =
+        arenaCategory
+            .charAt(0)
+            .toUpperCase()
+        +
+        arenaCategory.slice(1);
+
+    document.getElementById(
+        "arena-position"
+    ).textContent =
+        `${arenaIndex + 1} / ${examples.length}`;
+
+    document.getElementById(
+        "arena-example"
+    ).innerHTML = `
+
+        <div class="challenge-category">
+            ${escapeHtml(item.category)}
+        </div>
+
+        <p class="challenge-text">
+
+            "${escapeHtml(item.text)}"
+
+        </p>
+
+        <div class="challenge-actual">
+
+            Actual sentiment:
+
+            <strong class="${actualClass}">
+                ${item.actual_sentiment}
+            </strong>
+
+        </div>
+
+        <div class="challenge-models">
+
+            ${challengeModelCard(
+                "SimpleRNN",
+                item.models.simple_rnn
+            )}
+
+            ${challengeModelCard(
+                "LSTM",
+                item.models.lstm
+            )}
+
+            ${challengeModelCard(
+                "GRU",
+                item.models.gru
+            )}
+
+        </div>
+
+        <div class="challenge-actions">
+
+            <button
+                class="secondary-button"
+                id="try-this-example"
+            >
+                Try this live →
+            </button>
+
+        </div>
+
+    `;
+
+    document
+        .getElementById(
+            "try-this-example"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                useChallenge(
+                    item.text
+                );
+
+            }
+        );
+
+}
+
+// ============================================================
+// PREVIOUS / NEXT
+// ============================================================
+
+document
+    .getElementById(
+        "arena-previous"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            arenaIndex--;
+
+            renderArenaExample();
+
+        }
+    );
+
+document
+    .getElementById(
+        "arena-next"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            arenaIndex++;
+
+            renderArenaExample();
+
+        }
+    );
+
+// ============================================================
+// USE CHALLENGE IN LIVE ANALYZER
+// ============================================================
+
+function useChallenge(text) {
+
+    textInput.value =
+        text;
+
+    characterCount.textContent =
+        `${text.length} / 2000`;
+
+    selectedModel =
+        "compare";
+
+    document
+        .querySelectorAll(
+            ".mode-button"
+        )
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.model
+                === "compare"
+            );
+
+        });
+
+    analyzeButton.textContent =
+        "Compare models";
+
+    document
+        .querySelector(
+            '[data-view="analyze"]'
+        )
+        .click();
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+    textInput.focus();
+
+}
+
+// ============================================================
+// RANDOM CHALLENGE
+// ============================================================
+
+document
+    .getElementById(
+        "random-challenge-button"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            if (!benchmarkData) {
+                return;
+            }
+
+            const examples =
+                benchmarkData.examples;
+
+            const item =
+                examples[
+                    Math.floor(
+                        Math.random()
+                        *
+                        examples.length
+                    )
+                ];
+
+            useChallenge(
+                item.text
+            );
+
+        }
+    );
+
+// ============================================================
+// HALL OF SHAME
+// ============================================================
+
+function renderHallOfShame() {
+
+    const container =
+        document.getElementById(
+            "hall-of-shame"
+        );
+
+    container.innerHTML =
+        "";
+
+    const examples =
+        benchmarkData.hall_of_shame;
+
+    if (!examples.length) {
+
+        container.innerHTML = `
+            <p class="muted">
+                No unanimous failures found.
+            </p>
+        `;
+
+        return;
+    }
+
+    examples.forEach(item => {
+
+        const card =
+            document.createElement(
+                "article"
+            );
+
+        card.className =
+            "hall-card";
+
+        card.innerHTML = `
+
+            <div class="hall-category">
+
+                ${escapeHtml(
+                    item.category
+                )}
+
+            </div>
+
+            <div class="hall-text">
+
+                "${escapeHtml(
+                    item.text
+                )}"
+
+            </div>
+
+            <div class="hall-actual">
+
+                Actual:
+                ${escapeHtml(
+                    item.actual_sentiment
+                )}
+
+            </div>
+
+        `;
+
+        card.addEventListener(
+            "click",
+            () => {
+
+                useChallenge(
+                    item.text
+                );
+
+            }
+        );
+
+        container.appendChild(
+            card
+        );
+
+    });
+
+}
+
+// ============================================================
+// START BENCHMARK
+// ============================================================
+
+loadBenchmark();
