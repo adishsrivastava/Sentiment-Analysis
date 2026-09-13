@@ -6,508 +6,832 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-        content="Interactive RNN sentiment analysis using a SimpleRNN trained on IMDb movie reviews.">
+    <meta name="description" content="Sentiment Lab — compare SimpleRNN, LSTM and GRU sentiment models.">
 
-    <title>Sentiment — RNN Sentiment Analysis</title>
+    <title>Sentiment Lab</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <div class="app-shell">
+    <!-- =====================================================
+         MOBILE HEADER
+    ====================================================== -->
 
-        <!-- ================= SIDEBAR ================= -->
+    <header class="mobile-header">
 
-        <aside class="sidebar" id="sidebar">
+        <button id="mobile-menu-button" class="icon-button" aria-label="Open menu">
+            ☰
+        </button>
+
+        <div class="mobile-brand">
+            Sentiment Lab
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <div>
 
             <div class="brand">
-                <div class="brand-icon">S</div>
+
+                <div class="brand-mark">
+                    S
+                </div>
 
                 <div>
-                    <strong>Sentiment</strong>
-                    <span>RNN Lab</span>
+                    <div class="brand-name">
+                        Sentiment
+                    </div>
+
+                    <div class="brand-version">
+                        LAB · V3
+                    </div>
                 </div>
+
             </div>
 
 
-            <button class="new-analysis" onclick="newAnalysis()">
-                <span>＋</span>
-                New analysis
-            </button>
+            <nav class="sidebar-nav">
+
+                <button class="nav-item active" data-view="analyze">
+                    <span>⌁</span>
+                    Analyze
+                </button>
+
+                <button class="nav-item" data-view="arena">
+                    <span>◫</span>
+                    Model Arena
+                </button>
+
+                <button class="nav-item" data-view="about">
+                    <span>ⓘ</span>
+                    About the models
+                </button>
+
+            </nav>
 
 
             <div class="sidebar-section">
 
-                <p class="sidebar-label">
+                <div class="sidebar-label">
                     RECENT
-                </p>
+                </div>
 
-                <div id="historyList" class="history-list">
-
-                    <p class="history-empty">
+                <div id="history-list">
+                    <div class="sidebar-empty">
                         No analyses yet.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="sidebar-bottom">
-
-                <button class="sidebar-item" onclick="openModelModal()">
-                    <span>ⓘ</span>
-                    About the model
-                </button>
-
-
-                <a class="sidebar-item" href="https://github.com/adishsrivastava/RNN-Sentiment-Analysis" target="_blank"
-                    rel="noopener noreferrer">
-                    <span>↗</span>
-                    GitHub
-                </a>
-
-
-                <div class="theme-control">
-
-                    <button data-theme-option="light" title="Light mode">
-                        ☀
-                    </button>
-
-                    <button data-theme-option="system" title="System theme">
-                        ◐
-                    </button>
-
-                    <button data-theme-option="dark" title="Dark mode">
-                        ☾
-                    </button>
-
-                </div>
-
-            </div>
-
-        </aside>
-
-
-        <!-- ================= MAIN ================= -->
-
-        <main class="main">
-
-            <header class="mobile-header">
-
-                <button class="icon-button" onclick="toggleSidebar()">
-                    ☰
-                </button>
-
-                <strong>Sentiment</strong>
-
-                <button class="icon-button" onclick="cycleTheme()">
-                    ◐
-                </button>
-
-            </header>
-
-
-            <div class="content">
-
-                <!-- HERO -->
-
-                <section class="hero">
-
-                    <div class="eyebrow">
-                        SIMPLE RNN · SENTIMENT ANALYSIS
                     </div>
-
-                    <h1>
-                        What does the model think?
-                    </h1>
-
-                    <p>
-                        Write a movie review or sentence and see
-                        how a recurrent neural network interprets
-                        its sentiment.
-                    </p>
-
-                </section>
-
-
-                <!-- INPUT -->
-
-                <section class="composer">
-
-                    <textarea id="textInput" maxlength="2000" placeholder="Write something..."
-                        oninput="updateCharacterCount()"></textarea>
-
-
-                    <div class="composer-footer">
-
-                        <span id="characterCount">
-                            0 / 2000
-                        </span>
-
-                        <button id="analyzeButton" class="primary-button" onclick="analyzeSentiment()">
-                            Analyze
-                            <kbd>Ctrl ↵</kbd>
-                        </button>
-
-                    </div>
-
-                </section>
-
-
-                <!-- EXAMPLES -->
-
-                <section class="examples-section">
-
-                    <div class="section-heading">
-
-                        <h2>Try an example</h2>
-
-                        <div class="example-tabs">
-
-                            <button class="example-tab active" data-category="simple">
-                                Simple
-                            </button>
-
-                            <button class="example-tab" data-category="sarcasm">
-                                Sarcasm
-                            </button>
-
-                            <button class="example-tab" data-category="mixed">
-                                Mixed
-                            </button>
-
-                            <button class="example-tab" data-category="negation">
-                                Negation
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div id="exampleCards" class="example-cards"></div>
-
-                </section>
-
-
-                <!-- RESULT -->
-
-                <section id="resultSection" class="result-section hidden">
-
-                    <div class="section-heading">
-
-                        <h2>Result</h2>
-
-                        <span id="confidenceBadge"></span>
-
-                    </div>
-
-
-                    <div class="result-card">
-
-                        <div class="prediction-header">
-
-                            <div id="sentimentIcon" class="sentiment-icon">
-                                🙂
-                            </div>
-
-                            <div>
-
-                                <p class="muted-label">
-                                    PREDICTION
-                                </p>
-
-                                <h3 id="sentiment">
-                                    Positive
-                                </h3>
-
-                                <p id="confidenceText"></p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="probability-section">
-
-                            <div class="probability-row">
-
-                                <div class="probability-label">
-
-                                    <span>Positive</span>
-
-                                    <span id="positiveValue">
-                                        0%
-                                    </span>
-
-                                </div>
-
-                                <div class="progress-track">
-
-                                    <div id="positiveBar" class="progress-fill positive"></div>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="probability-row">
-
-                                <div class="probability-label">
-
-                                    <span>Negative</span>
-
-                                    <span id="negativeValue">
-                                        0%
-                                    </span>
-
-                                </div>
-
-                                <div class="progress-track">
-
-                                    <div id="negativeBar" class="progress-fill negative"></div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- FEEDBACK -->
-
-                        <div class="feedback">
-
-                            <span>
-                                Was the model right?
-                            </span>
-
-                            <button onclick="submitFeedback(true)">
-                                👍 Yes
-                            </button>
-
-                            <button onclick="submitFeedback(false)">
-                                👎 No
-                            </button>
-
-                            <span id="feedbackMessage" class="feedback-message"></span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- HOW MODEL SEES TEXT -->
-
-                    <details class="explanation">
-
-                        <summary>
-                            How the model sees your text
-                        </summary>
-
-
-                        <div class="explanation-content">
-
-                            <div class="explanation-block">
-
-                                <span class="muted-label">
-                                    ORIGINAL
-                                </span>
-
-                                <p id="originalText"></p>
-
-                            </div>
-
-
-                            <div class="explanation-block">
-
-                                <span class="muted-label">
-                                    CLEANED
-                                </span>
-
-                                <p id="cleanedText"></p>
-
-                            </div>
-
-
-                            <div class="explanation-block">
-
-                                <span class="muted-label">
-                                    TOKENS
-                                </span>
-
-                                <div id="tokenList" class="token-list"></div>
-
-                            </div>
-
-
-                            <div class="sequence-info">
-
-                                <span id="tokenCount"></span>
-
-                                <span>
-                                    Padded to 200 tokens
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </details>
-
-                </section>
-
-
-                <!-- CHALLENGE -->
-
-                <section class="challenge-card">
-
-                    <div>
-
-                        <span class="eyebrow">
-                            CHALLENGE THE RNN
-                        </span>
-
-                        <h2>
-                            Think you can fool it?
-                        </h2>
-
-                        <p>
-                            Try sarcasm, double negatives or mixed
-                            opinions and see whether the model gets
-                            confused.
-                        </p>
-
-                    </div>
-
-                    <button class="secondary-button" onclick="startChallenge()">
-                        Give me a challenge →
-                    </button>
-
-                </section>
-
-
-                <!-- FOOTER -->
-
-                <footer>
-
-                    <span>
-                        Built with SimpleRNN · TensorFlow · Flask
-                    </span>
-
-                    <span>
-                        Trained on IMDb movie reviews
-                    </span>
-
-                </footer>
-
-            </div>
-
-        </main>
-
-    </div>
-
-
-    <!-- ================= MODEL MODAL ================= -->
-
-    <div id="modelModal" class="modal-backdrop hidden" onclick="closeModelModal(event)">
-
-        <div class="modal">
-
-            <div class="modal-header">
-
-                <div>
-
-                    <span class="eyebrow">
-                        MODEL CARD
-                    </span>
-
-                    <h2>About this model</h2>
-
                 </div>
-
-                <button class="icon-button" onclick="closeModelModal()">
-                    ×
-                </button>
-
-            </div>
-
-
-            <div class="model-grid">
-
-                <div>
-                    <span>Architecture</span>
-                    <strong>SimpleRNN</strong>
-                </div>
-
-                <div>
-                    <span>Dataset</span>
-                    <strong>IMDb Reviews</strong>
-                </div>
-
-                <div>
-                    <span>Vocabulary</span>
-                    <strong>10,000 words</strong>
-                </div>
-
-                <div>
-                    <span>Sequence</span>
-                    <strong>200 tokens</strong>
-                </div>
-
-            </div>
-
-
-            <div class="architecture">
-
-                <div>Embedding</div>
-                <span>↓</span>
-                <div>SimpleRNN · 64</div>
-                <span>↓</span>
-                <div>Dropout</div>
-                <span>↓</span>
-                <div>Dense · 32 · ReLU</div>
-                <span>↓</span>
-                <div>Sigmoid</div>
-
-            </div>
-
-
-            <div class="limitations">
-
-                <h3>Limitations</h3>
-
-                <ul>
-                    <li>
-                        Trained primarily on movie reviews.
-                    </li>
-
-                    <li>
-                        Only predicts positive or negative sentiment.
-                    </li>
-
-                    <li>
-                        Sarcasm can confuse the model.
-                    </li>
-
-                    <li>
-                        Mixed sentiment is reduced to one label.
-                    </li>
-
-                    <li>
-                        This is an educational model, not a
-                        general-purpose language understanding system.
-                    </li>
-                </ul>
 
             </div>
 
         </div>
 
-    </div>
+
+        <div class="sidebar-bottom">
+
+            <a class="sidebar-link" href="https://github.com/adishsrivastava/Sentiment-Analysis" target="_blank"
+                rel="noopener noreferrer">
+                <span>↗</span>
+                GitHub
+            </a>
+
+
+            <div class="theme-switcher">
+
+                <button class="theme-button" data-theme-choice="light" title="Light mode">
+                    ☀
+                </button>
+
+                <button class="theme-button" data-theme-choice="system" title="System theme">
+                    ◐
+                </button>
+
+                <button class="theme-button" data-theme-choice="dark" title="Dark mode">
+                    ☾
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- =================================================
+             ANALYZE VIEW
+        ================================================== -->
+
+        <section id="view-analyze" class="view active">
+
+            <div class="page-header">
+
+                <div class="eyebrow">
+                    RNN · LSTM · GRU
+                </div>
+
+                <h1>
+                    What do the models think?
+                </h1>
+
+                <p>
+                    Send the same text through three recurrent
+                    architectures and compare how they interpret it.
+                </p>
+
+            </div>
+
+
+            <!-- MODE SELECTOR -->
+
+            <div class="mode-selector">
+
+                <button class="mode-button" data-model="simple_rnn">
+                    SimpleRNN
+                </button>
+
+                <button class="mode-button" data-model="lstm">
+                    LSTM
+                </button>
+
+                <button class="mode-button" data-model="gru">
+                    GRU
+                </button>
+
+                <button class="mode-button active" data-model="compare">
+                    Compare all
+                </button>
+
+            </div>
+
+
+            <!-- INPUT -->
+
+            <div class="composer">
+
+                <textarea id="text-input" maxlength="2000" placeholder="Write a movie review or sentence..."></textarea>
+
+
+                <div class="composer-footer">
+
+                    <span id="character-count">
+                        0 / 2000
+                    </span>
+
+                    <button id="analyze-button" class="primary-button">
+                        Compare models
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- EXAMPLES -->
+
+            <div class="examples">
+
+                <div class="section-heading-row">
+
+                    <span class="section-label">
+                        TRY AN EXAMPLE
+                    </span>
+
+                    <div class="example-tabs">
+
+                        <button class="example-tab active" data-category="simple">
+                            Simple
+                        </button>
+
+                        <button class="example-tab" data-category="mixed">
+                            Mixed
+                        </button>
+
+                        <button class="example-tab" data-category="negation">
+                            Negation
+                        </button>
+
+                        <button class="example-tab" data-category="sarcasm">
+                            Sarcasm
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div id="example-grid" class="example-grid"></div>
+
+            </div>
+
+
+            <!-- LOADING -->
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                Running recurrent models...
+            </div>
+
+
+            <!-- ERROR -->
+
+            <div id="error-message" class="error-message hidden"></div>
+
+
+            <!-- RESULTS -->
+
+            <section id="results-section" class="results-section hidden">
+
+                <div class="section-heading-row">
+
+                    <span class="section-label">
+                        RESULTS
+                    </span>
+
+                    <span id="result-mode-label" class="muted">
+                        Compare all
+                    </span>
+
+                </div>
+
+
+                <div id="model-results" class="model-results"></div>
+
+
+                <div id="agreement-card" class="agreement-card hidden"></div>
+
+
+                <!-- EXPLAINABILITY -->
+
+                <details id="analysis-details" class="analysis-details">
+
+                    <summary>
+                        How the models see your text
+                    </summary>
+
+
+                    <div class="analysis-content">
+
+                        <div class="analysis-block">
+
+                            <div class="analysis-label">
+                                ORIGINAL
+                            </div>
+
+                            <div id="analysis-original" class="analysis-text"></div>
+
+                        </div>
+
+
+                        <div class="analysis-arrow">
+                            ↓ cleaning
+                        </div>
+
+
+                        <div class="analysis-block">
+
+                            <div class="analysis-label">
+                                CLEANED
+                            </div>
+
+                            <div id="analysis-cleaned" class="analysis-text mono"></div>
+
+                        </div>
+
+
+                        <div class="analysis-arrow">
+                            ↓ tokenization
+                        </div>
+
+
+                        <div class="analysis-block">
+
+                            <div class="analysis-label">
+                                TOKENS
+                            </div>
+
+                            <div id="token-list" class="token-list"></div>
+
+                        </div>
+
+
+                        <div class="analysis-meta">
+
+                            <span>
+                                Tokens:
+                                <strong id="token-count">0</strong>
+                            </span>
+
+                            <span>
+                                Sequence length:
+                                <strong id="sequence-length">200</strong>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </details>
+
+            </section>
+
+        </section>
+
+
+        <!-- =================================================
+             MODEL ARENA
+        ================================================== -->
+
+        <section id="view-arena" class="view">
+
+            <div class="page-header">
+
+                <div class="eyebrow">
+                    DIAGNOSTIC BENCHMARK
+                </div>
+
+                <h1>
+                    Model Arena
+                </h1>
+
+                <p>
+                    IMDb accuracy tells only part of the story.
+                    These hand-written challenges probe specific
+                    linguistic weaknesses.
+                </p>
+
+            </div>
+
+
+            <div class="arena-note">
+
+                <strong>80 examples</strong>
+
+                <span>·</span>
+
+                20 per category
+
+                <span>·</span>
+
+                balanced positive / negative labels
+
+                <span>·</span>
+
+                not used for training
+
+            </div>
+
+
+            <div class="benchmark-table-wrapper">
+
+                <table class="benchmark-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Challenge</th>
+                            <th>SimpleRNN</th>
+                            <th>LSTM</th>
+                            <th>GRU</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                <strong>Simple</strong>
+                                <small>
+                                    Direct sentiment
+                                </small>
+                            </td>
+
+                            <td>90%</td>
+                            <td class="best-cell">100%</td>
+                            <td class="best-cell">100%</td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <strong>Mixed</strong>
+                                <small>
+                                    Conflicting sentiment
+                                </small>
+                            </td>
+
+                            <td>70%</td>
+                            <td>70%</td>
+                            <td class="best-cell">90%</td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <strong>Negation</strong>
+                                <small>
+                                    Not bad / not good
+                                </small>
+                            </td>
+
+                            <td>25%</td>
+                            <td class="best-cell">35%</td>
+                            <td>25%</td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <strong>Sarcasm</strong>
+                                <small>
+                                    Surface meaning reversal
+                                </small>
+                            </td>
+
+                            <td>35%</td>
+                            <td class="best-cell">50%</td>
+                            <td>35%</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="insight-grid">
+
+                <article class="insight-card">
+
+                    <span class="insight-number">
+                        87.08%
+                    </span>
+
+                    <h3>
+                        GRU wins overall
+                    </h3>
+
+                    <p>
+                        GRU achieved the highest accuracy on the
+                        9,917-review IMDb test set.
+                    </p>
+
+                </article>
+
+
+                <article class="insight-card">
+
+                    <span class="insight-number">
+                        90%
+                    </span>
+
+                    <h3>
+                        GRU handles mixed sentiment
+                    </h3>
+
+                    <p>
+                        It substantially outperformed both other
+                        architectures on our mixed-sentiment set.
+                    </p>
+
+                </article>
+
+
+                <article class="insight-card danger">
+
+                    <span class="insight-number">
+                        25–35%
+                    </span>
+
+                    <h3>
+                        Negation breaks them
+                    </h3>
+
+                    <p>
+                        All three models performed below chance on
+                        the balanced negation challenge.
+                    </p>
+
+                </article>
+
+
+                <article class="insight-card danger">
+
+                    <span class="insight-number">
+                        35–50%
+                    </span>
+
+                    <h3>
+                        Sarcasm remains difficult
+                    </h3>
+
+                    <p>
+                        Better general IMDb accuracy did not translate
+                        into reliable sarcasm recognition.
+                    </p>
+
+                </article>
+
+            </div>
+
+
+            <div class="arena-explanation">
+
+                <h2>
+                    Why this matters
+                </h2>
+
+                <p>
+                    A model can score well on its standard test set
+                    while failing badly on a narrow linguistic
+                    phenomenon. The challenge set is intentionally
+                    small and diagnostic, so these numbers should not
+                    be treated as a general benchmark.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ABOUT MODELS
+        ================================================== -->
+
+        <section id="view-about" class="view">
+
+            <div class="page-header">
+
+                <div class="eyebrow">
+                    CONTROLLED EXPERIMENT
+                </div>
+
+                <h1>
+                    Three architectures. Same data.
+                </h1>
+
+                <p>
+                    The recurrent layer changes. The dataset,
+                    tokenizer, sequence length and surrounding
+                    architecture remain controlled.
+                </p>
+
+            </div>
+
+
+            <div class="model-stat-grid">
+
+                <!-- RNN -->
+
+                <article class="model-stat-card">
+
+                    <div class="model-card-header">
+
+                        <div>
+                            <span class="model-type">
+                                BASELINE
+                            </span>
+
+                            <h2>
+                                SimpleRNN
+                            </h2>
+                        </div>
+
+                        <span class="architecture-badge">
+                            RNN
+                        </span>
+
+                    </div>
+
+
+                    <div class="big-stat">
+                        81.36%
+                    </div>
+
+                    <div class="big-stat-label">
+                        IMDb test accuracy
+                    </div>
+
+
+                    <div class="stat-list">
+
+                        <div>
+                            <span>Macro F1</span>
+                            <strong>81.33%</strong>
+                        </div>
+
+                        <div>
+                            <span>Parameters</span>
+                            <strong>650,369</strong>
+                        </div>
+
+                        <div>
+                            <span>Model size</span>
+                            <strong>7.48 MB</strong>
+                        </div>
+
+                        <div>
+                            <span>Best epoch</span>
+                            <strong>7</strong>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- LSTM -->
+
+                <article class="model-stat-card">
+
+                    <div class="model-card-header">
+
+                        <div>
+                            <span class="model-type">
+                                GATED RNN
+                            </span>
+
+                            <h2>
+                                LSTM
+                            </h2>
+                        </div>
+
+                        <span class="architecture-badge">
+                            LSTM
+                        </span>
+
+                    </div>
+
+
+                    <div class="big-stat">
+                        85.29%
+                    </div>
+
+                    <div class="big-stat-label">
+                        IMDb test accuracy
+                    </div>
+
+
+                    <div class="stat-list">
+
+                        <div>
+                            <span>Macro F1</span>
+                            <strong>85.25%</strong>
+                        </div>
+
+                        <div>
+                            <span>Parameters</span>
+                            <strong>675,137</strong>
+                        </div>
+
+                        <div>
+                            <span>Model size</span>
+                            <strong>7.76 MB</strong>
+                        </div>
+
+                        <div>
+                            <span>Best epoch</span>
+                            <strong>1</strong>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- GRU -->
+
+                <article class="model-stat-card winner">
+
+                    <div class="model-card-header">
+
+                        <div>
+                            <span class="model-type">
+                                BEST OVERALL
+                            </span>
+
+                            <h2>
+                                GRU
+                            </h2>
+                        </div>
+
+                        <span class="architecture-badge">
+                            GRU
+                        </span>
+
+                    </div>
+
+
+                    <div class="big-stat">
+                        87.08%
+                    </div>
+
+                    <div class="big-stat-label">
+                        IMDb test accuracy
+                    </div>
+
+
+                    <div class="stat-list">
+
+                        <div>
+                            <span>Macro F1</span>
+                            <strong>87.06%</strong>
+                        </div>
+
+                        <div>
+                            <span>Parameters</span>
+                            <strong>667,073</strong>
+                        </div>
+
+                        <div>
+                            <span>Model size</span>
+                            <strong>7.67 MB</strong>
+                        </div>
+
+                        <div>
+                            <span>Best epoch</span>
+                            <strong>2</strong>
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+            <div class="experiment-card">
+
+                <h2>
+                    Experiment setup
+                </h2>
+
+
+                <div class="experiment-grid">
+
+                    <div>
+                        <span>Dataset</span>
+                        <strong>IMDb reviews</strong>
+                    </div>
+
+                    <div>
+                        <span>Original reviews</span>
+                        <strong>50,000</strong>
+                    </div>
+
+                    <div>
+                        <span>Duplicates removed</span>
+                        <strong>418</strong>
+                    </div>
+
+                    <div>
+                        <span>Usable reviews</span>
+                        <strong>49,582</strong>
+                    </div>
+
+                    <div>
+                        <span>Training pool</span>
+                        <strong>39,665</strong>
+                    </div>
+
+                    <div>
+                        <span>Test reviews</span>
+                        <strong>9,917</strong>
+                    </div>
+
+                    <div>
+                        <span>Vocabulary</span>
+                        <strong>10,000</strong>
+                    </div>
+
+                    <div>
+                        <span>Sequence length</span>
+                        <strong>200</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
