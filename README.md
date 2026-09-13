@@ -1,166 +1,320 @@
-# Sentiment Analyzer
+# Sentiment Lab
 
-A small sentiment analysis playground built around a recurrent neural network.
+An interactive playground for comparing recurrent neural networks on sentiment analysis.
 
-I originally built this as part of a Deep Learning lab experiment to understand how RNNs work with sequential data. Instead of stopping at the notebook, I trained the model on IMDb movie reviews, saved it, built a Flask application around it, and deployed the whole thing as an interactive web app.
+This project started as a fairly ordinary Deep Learning lab experiment: train a SimpleRNN on IMDb movie reviews and classify reviews as positive or negative.
 
-The interesting part isn't just whether the model says **positive** or **negative**. The app also lets you see how the input is cleaned and tokenized, try sentences that are deliberately difficult for the model, and explore some of the limitations of a relatively simple RNN.
+I didn't want to leave it in a Colab notebook.
 
-**[Try the live app](https://sentiment-analysis-ten-omega.vercel.app)**
+The first model became a small Flask application, which eventually turned into **Sentiment Lab** — an experiment comparing SimpleRNN, LSTM and GRU models trained under the same conditions, along with an interface for exploring not only what they get right, but where they fail.
+
+**[Try Sentiment Lab](YOUR_V3_PRODUCTION_URL)**
+
+> The original SimpleRNN version of the project is preserved on the [`Initial-Iteration-RNN`](../../tree/Initial-Iteration-RNN) branch.
 
 ---
 
-## What it does
+## The experiment
 
-Type in a movie review or a sentence and the model returns:
+All three V3 models were trained using the same:
 
-- a positive or negative prediction
-- the model's confidence
-- positive and negative probability scores
-- the cleaned version of the input
-- the tokens and token IDs seen by the model
+- IMDb review dataset
+- train/test split
+- text-cleaning pipeline
+- tokenizer
+- 10,000-word vocabulary
+- 200-token sequence length
+- 64-dimensional embedding
+- 64 recurrent units
+- 32-unit dense layer
+- batch size
+- early-stopping strategy
 
-There are also a few features built around experimenting with the model rather than just using it.
-
-### Challenge the RNN
-
-The app includes prompts designed to make the classifier's job harder. Try sarcasm, double negatives, conflicting opinions, or sentences where the literal words don't quite match the intended sentiment.
-
-For example:
-
-> Fantastic. Another two hours of my life I'll never get back.
-
-A human immediately understands the sarcasm. A small RNN may not.
-
-That's part of the fun.
-
-### Difficult examples
-
-The example library is split into:
-
-- **Simple** — straightforward positive and negative statements
-- **Sarcasm** — positive vocabulary with negative intent
-- **Mixed** — praise and criticism in the same sentence
-- **Negation** — sentences such as "I wouldn't say this movie was bad"
-
-These are useful for seeing where binary sentiment classification starts to become less straightforward.
-
-### How the model sees your text
-
-After making a prediction, the preprocessing pipeline can be expanded to show something roughly like:
+The main variable is the recurrent architecture itself.
 
 ```text
-Original
-"This movie was absolutely amazing!"
+                         IMDb reviews
+                              │
+                              ▼
+                        preprocessing
+                              │
+                              ▼
+                       shared tokenizer
+                              │
+                              ▼
+                      padded sequences
+                              │
+             ┌────────────────┼────────────────┐
+             ▼                ▼                ▼
+        SimpleRNN            LSTM             GRU
+             │                │                │
+             └────────────────┼────────────────┘
+                              ▼
+                       same test set
+```
 
-        ↓
+That makes the comparison considerably more useful than training three unrelated models with different settings.
 
-Cleaned
-"this movie was absolutely amazing"
+---
 
-        ↓
+## Results
 
-Tokens
-this      movie      was      absolutely      amazing
- 11         17        13          425            477
+After removing 418 duplicate reviews, the final dataset contained **49,582 reviews**.
 
-        ↓
+- 39,665 reviews formed the training pool
+- 9,917 reviews formed the test set
 
-Padded sequence (200 tokens)
+### IMDb test performance
 
-        ↓
+| Model | Accuracy | Macro F1 | Test loss | Parameters | Size |
+|---|---:|---:|---:|---:|---:|
+| SimpleRNN | 81.36% | 81.33% | 0.4727 | 650,369 | 7.48 MB |
+| LSTM | 85.29% | 85.25% | 0.3445 | 675,137 | 7.76 MB |
+| **GRU** | **87.08%** | **87.06%** | **0.3264** | 667,073 | 7.67 MB |
 
+GRU was the strongest model on the standard IMDb test set.
+
+The interesting part is that it achieved a **5.73 percentage-point improvement over SimpleRNN** while using only 16,704 additional parameters.
+
+But "GRU is the best model" turned out to be an incomplete conclusion.
+
+---
+
+## Model Arena
+
+A high test accuracy doesn't mean a model understands every kind of language equally well.
+
+I created a separate **80-example diagnostic challenge set** containing four categories:
+
+- Simple sentiment
+- Mixed sentiment
+- Negation
+- Sarcasm
+
+Each category contains 20 hand-written examples with balanced positive and negative labels. None of them were used for training.
+
+| Challenge | SimpleRNN | LSTM | GRU |
+|---|---:|---:|---:|
+| Simple | 90% | **100%** | **100%** |
+| Mixed | 70% | 70% | **90%** |
+| Negation | 25% | **35%** | 25% |
+| Sarcasm | 35% | **50%** | 35% |
+
+This produced my favourite result from the project.
+
+The GRU scores **87.08%** on the IMDb test set and **90%** on the mixed-sentiment challenge, yet only **25%** on the negation set and **35%** on sarcasm.
+
+In other words, good overall accuracy can hide spectacularly bad performance on a particular linguistic phenomenon.
+
+### Negation is especially painful
+
+Consider:
+
+> I did not hate this movie.
+
+A human understands that *not* changes the meaning of *hate*.
+
+The models often don't.
+
+On positive negation examples, the models scored:
+
+| Model | Accuracy |
+|---|---:|
+| SimpleRNN | 10% |
+| LSTM | 20% |
+| GRU | 20% |
+
+This isn't simply random error. The models appear to be systematically influenced by sentiment-heavy words even when negation changes the meaning of the phrase.
+
+### Sarcasm isn't much kinder
+
+Consider:
+
+> Fantastic, another two hours of my life I will never get back.
+
+The word *fantastic* looks positive. The sentence clearly isn't.
+
+On the sarcasm challenge:
+
+| Model | Negative sarcasm | Positive sarcasm |
+|---|---:|---:|
+| SimpleRNN | 40% | 30% |
+| LSTM | **60%** | **40%** |
+| GRU | 30% | **40%** |
+
+The challenge set is intentionally small and diagnostic, so these figures shouldn't be interpreted as general-purpose sarcasm benchmarks. They're there to expose interesting failure modes.
+
+---
+
+## What you can do in Sentiment Lab
+
+### Compare models
+
+Enter one sentence and run it through:
+
+```text
 SimpleRNN
-
-        ↓
-
-Positive
+LSTM
+GRU
 ```
 
-The intention is to make the inference process a little less opaque.
+individually, or use **Compare All**.
 
----
+Each model gets its own negative-to-positive sentiment meter, making disagreements easy to see.
 
-## Model
+### Model disagreement
 
-The classifier is a fairly small Keras model:
+Something like:
 
 ```text
-Input text
-    │
-    ▼
-Tokenization
-    │
-    ▼
-Padding (200 tokens)
-    │
-    ▼
-Embedding
-    │
-    ▼
-SimpleRNN (64)
-    │
-    ▼
-Dropout
-    │
-    ▼
-Dense (32, ReLU)
-    │
-    ▼
-Dense (1, Sigmoid)
-    │
-    ▼
-Positive / Negative
+"This movie wasn't nearly as bad as I expected."
+
+SimpleRNN     Negative
+LSTM          Positive
+GRU           Positive
+
+⚡ Model disagreement
 ```
 
-| | |
-|---|---|
-| **Dataset** | IMDb movie reviews |
-| **Task** | Binary sentiment classification |
-| **Architecture** | SimpleRNN |
-| **Vocabulary size** | 10,000 |
-| **Maximum sequence length** | 200 |
-| **Output** | Positive / Negative |
-| **Framework** | TensorFlow / Keras |
+is much more interesting than simply displaying the majority answer.
 
-The model uses a sigmoid output, so values above `0.5` are classified as positive and values below `0.5` as negative.
+The disagreement itself tells us something about the architectures.
+
+### See what the models see
+
+The application exposes the preprocessing pipeline:
+
+```text
+Original text
+      ↓
+Cleaning
+      ↓
+Tokenization
+      ↓
+Token IDs
+      ↓
+Padding to 200 tokens
+      ↓
+Recurrent model
+      ↓
+Sentiment score
+```
+
+This doesn't make a neural network fully explainable, but it does make the input pipeline less mysterious.
+
+### Model Arena
+
+The 80 diagnostic examples can be explored directly in the application.
+
+You can browse Simple, Mixed, Negation and Sarcasm examples and see which architecture got each one right.
+
+### Hall of Shame
+
+Some inputs manage to fool **all three models**.
+
+Naturally, they deserved their own section.
+
+The Hall of Shame automatically surfaces examples where SimpleRNN, LSTM and GRU all predicted the wrong label.
+
+### Random Challenge
+
+If you don't know what to type, the application can select one of the diagnostic examples and throw it into the live three-model comparison.
 
 ---
 
-## Preprocessing
+## Architecture
 
-The inference pipeline deliberately uses the same preprocessing that was used during training.
+The surrounding network is deliberately kept similar between models.
 
-Reviews are:
+```text
+Text
+ │
+ ▼
+Tokenizer
+ │
+ ▼
+Padding (200)
+ │
+ ▼
+Embedding (64)
+ │
+ ├───────────────┬───────────────┐
+ ▼               ▼               ▼
+SimpleRNN(64)   LSTM(64)        GRU(64)
+ │               │               │
+ └───────────────┴───────────────┘
+                 │
+                 ▼
+             Dropout
+                 │
+                 ▼
+          Dense (32, ReLU)
+                 │
+                 ▼
+        Dense (1, Sigmoid)
+                 │
+                 ▼
+       Negative ↔ Positive
+```
 
-1. converted to lowercase
-2. stripped of HTML
-3. stripped of URLs
-4. reduced to English letters and whitespace
-5. tokenized using the saved training vocabulary
-6. padded or truncated to 200 tokens
+The sigmoid output is displayed as a **sentiment score**, rather than claiming it is a calibrated confidence probability.
 
-Keeping the tokenizer is particularly important. Training a new tokenizer at inference time would assign different integer IDs to words and make the saved model effectively useless.
+---
+
+## Project evolution
+
+### V1 — The experiment
+
+Train a SimpleRNN for a Deep Learning lab and understand how recurrent networks work with sequential text.
+
+### V2 — The application
+
+Take the trained model out of the notebook.
+
+The project gained:
+
+- Flask inference
+- a deployed web interface
+- light/dark themes
+- preprocessing visualization
+- example prompts
+- prediction history
+- challenge prompts
+
+The source for this iteration is preserved on:
+
+**[`Initial-Iteration-RNN`](../../tree/Initial-Iteration-RNN)**
+
+### V3 — Sentiment Lab
+
+Retrain from scratch on the larger dataset and turn the application into a controlled architecture comparison:
+
+```text
+SimpleRNN vs LSTM vs GRU
+```
+
+Then deliberately look for cases where the models fail.
+
+That turned out to be considerably more interesting than simply chasing a higher accuracy number.
 
 ---
 
 ## Tech stack
 
-The project is intentionally pretty small.
-
-**Model**
+**Machine learning**
 
 - Python
 - TensorFlow
 - Keras
 - SimpleRNN
+- LSTM
+- GRU
+- scikit-learn
+- pandas / NumPy
 
-**Backend**
+**Application**
 
 - Flask
-
-**Frontend**
-
 - HTML
 - CSS
 - Vanilla JavaScript
@@ -169,112 +323,25 @@ The project is intentionally pretty small.
 
 - Vercel
 
-There is no frontend framework and no database. Prediction history, theme preference, and feedback are stored locally in the browser.
-
----
-
-## Running it locally
-
-Clone the repository:
-
-```bash
-git clone https://github.com/adishsrivastava/RNN-Sentiment-Analysis.git
-cd RNN-Sentiment-Analysis
-```
-
-Create a virtual environment:
-
-```bash
-python -m venv .venv
-```
-
-On Windows:
-
-```bash
-.venv\Scripts\activate
-```
-
-On macOS/Linux:
-
-```bash
-source .venv/bin/activate
-```
-
-Install the dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run Flask:
-
-```bash
-python app.py
-```
-
-Then open:
-
-```text
-http://127.0.0.1:5000
-```
-
-You can also check that the backend is alive at:
-
-```text
-http://127.0.0.1:5000/health
-```
-
----
-
-## API
-
-The frontend talks to a small Flask endpoint that can also be used directly.
-
-### `POST /predict`
-
-Request:
-
-```json
-{
-  "text": "I absolutely loved this movie."
-}
-```
-
-Example response:
-
-```json
-{
-  "sentiment": "Positive",
-  "confidence": 92.41,
-  "positive_probability": 92.41,
-  "negative_probability": 7.59,
-  "analysis": {
-    "original": "I absolutely loved this movie.",
-    "cleaned": "i absolutely loved this movie",
-    "tokens": [
-      {
-        "word": "i",
-        "id": 10
-      }
-    ],
-    "token_count": 5,
-    "sequence_length": 200
-  }
-}
-```
-
-The exact probabilities depend on the trained model.
+There is deliberately no frontend framework or database at this stage.
 
 ---
 
 ## Project structure
 
 ```text
-RNN-Sentiment-Analysis/
+Sentiment-Analysis/
+│
+├── benchmarks/
+│   ├── challenge_benchmark.csv
+│   └── challenge_results.csv
 │
 ├── model/
-│   ├── sentiment_rnn.keras
-│   └── tokenizer.pkl
+│   ├── simple_rnn.keras
+│   ├── lstm.keras
+│   ├── gru.keras
+│   ├── tokenizer.pkl
+│   └── metadata.json
 │
 ├── static/
 │   ├── script.js
@@ -285,115 +352,185 @@ RNN-Sentiment-Analysis/
 │
 ├── app.py
 ├── requirements.txt
-├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
-`sentiment_rnn.keras` contains the trained network, while `tokenizer.pkl` preserves the vocabulary learned from the training data.
+---
+
+## Running locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/adishsrivastava/Sentiment-Analysis.git
+cd Sentiment-Analysis
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run:
+
+```bash
+python app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+---
+
+## API
+
+### Compare all models
+
+```http
+POST /compare
+```
+
+Request:
+
+```json
+{
+  "text": "This movie wasn't nearly as bad as I expected."
+}
+```
+
+The response contains separate SimpleRNN, LSTM and GRU predictions, sentiment scores, inference times and model-agreement information.
+
+### Individual models
+
+```text
+POST /predict/simple_rnn
+POST /predict/lstm
+POST /predict/gru
+```
+
+### Experiment information
+
+```text
+GET /models
+```
+
+### Diagnostic benchmark
+
+```text
+GET /benchmark
+```
+
+### Health check
+
+```text
+GET /health
+```
 
 ---
 
 ## Limitations
 
-This model is deliberately not presented as a general-purpose sentiment system.
+This is an educational/experimental sentiment-analysis project, not a general language-understanding system.
 
-It was trained on **IMDb movie reviews**, which means its training distribution is fairly specific. It also has only two possible outputs:
+The models:
 
-```text
-Positive
-Negative
-```
+- were trained primarily on IMDb movie reviews
+- perform binary classification only
+- have no neutral class
+- can struggle with domain shift
+- perform poorly on our negation challenge
+- perform poorly on sarcasm
+- can assign strong scores to incorrect predictions
+- should not be treated as reliable interpreters of arbitrary real-world text
 
-There is no neutral or mixed class.
-
-That leads to some interesting failure cases.
-
-The model may struggle with:
-
-- sarcasm
-- irony
-- double negatives
-- mixed sentiment
-- neutral statements
-- subtle contextual meaning
-- language that differs significantly from IMDb-style reviews
-
-For example:
-
-> The cinematography was beautiful, but everything else was terrible.
-
-contains both positive and negative sentiment, but the model is forced to reduce it to a single label.
-
-Similarly:
-
-> Great. Exactly what I needed today.
-
-could be sincere or sarcastic depending on context that the model simply doesn't have.
-
-These aren't bugs in the web application; they're useful demonstrations of the limits of the model and the task it was trained for.
+Those limitations are intentionally visible in the application rather than hidden.
 
 ---
 
-## Why a SimpleRNN?
+## What's next?
 
-Mostly because that was the point of the experiment.
+A few directions I'm interested in:
 
-There are much stronger approaches to sentiment analysis today. The goal here wasn't to build the best sentiment classifier available; it was to build, train, deploy, and understand a recurrent neural network end to end.
+- [x] SimpleRNN baseline
+- [x] LSTM comparison
+- [x] GRU comparison
+- [x] Three-model inference
+- [x] Model disagreement
+- [x] Diagnostic challenge benchmark
+- [x] Model Arena
+- [x] Hall of Shame
+- [ ] Larger independent negation benchmark
+- [ ] Larger independent sarcasm benchmark
+- [ ] Probability calibration
+- [ ] Repeated training runs with multiple random seeds
+- [ ] Transformer baseline
+- [ ] Human feedback collection
+- [ ] Feedback-driven continual learning
+- [ ] Measure whether continual learning improves difficult categories without damaging IMDb performance
 
-That also gives this project somewhere interesting to go next.
+The last one is where this project could get particularly interesting.
 
 ---
 
-## Roadmap
+## Previous version
 
-The next major version will turn the project into more of a recurrent-network comparison lab.
+Want to see where this started?
 
-- [x] Train a SimpleRNN sentiment classifier
-- [x] Build a Flask inference API
-- [x] Deploy the trained model
-- [x] Add light, dark and system themes
-- [x] Add prediction confidence visualization
-- [x] Show preprocessing and tokenization
-- [x] Add difficult sentiment examples
-- [x] Add Challenge the RNN mode
-- [x] Add local prediction history
-- [ ] Train an LSTM classifier
-- [ ] Train a GRU classifier
-- [ ] Compare RNN, LSTM and GRU predictions side by side
-- [ ] Compare accuracy, parameter count and inference time
-- [ ] Collect interesting failure cases into a "Hall of Shame"
-- [ ] Add a small transformer baseline
+The original single-model application is preserved on the:
 
-The eventual goal is to make it possible to enter one sentence and watch several sequence models disagree with each other.
+**[`Initial-Iteration-RNN`](../../tree/Initial-Iteration-RNN) branch**
+
+A separate archived V2 deployment is also available here:
+
+**[Open Sentiment V2](YOUR_V2_ARCHIVE_URL)**
 
 ---
 
 ## Contributing
 
-This started as a learning project, but contributions are welcome.
+Contributions and experiments are welcome.
 
-Some relatively approachable areas to contribute to are:
+Interesting areas include:
 
-- adding interesting challenge prompts
 - finding reproducible model failure cases
-- improving accessibility
-- improving the mobile interface
-- adding tests
-- improving model visualizations
-- experimenting with other recurrent architectures
+- adding diagnostic examples
+- accessibility improvements
+- mobile UI improvements
+- model evaluation
+- tests
+- additional architectures
 
-If you're making a larger change, opening an issue first is probably the easiest way to discuss it.
-
----
-
-## Acknowledgements
-
-The model was trained using the IMDb movie review dataset and built with TensorFlow/Keras.
-
-The interface takes inspiration from the restrained, content-first design of tools such as Notion, while being implemented from scratch for this project.
+If you're planning a substantial model change, opening an issue first is probably easiest.
 
 ---
 
 ## License
 
-This project is open source. See [`LICENSE`](LICENSE) for details.
+Released under the [MIT License](LICENSE).
+
+---
+
+Built because submitting the notebook felt like an unsatisfying place to stop.
