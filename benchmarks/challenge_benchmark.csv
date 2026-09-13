@@ -1,0 +1,81 @@
+category,text,label
+simple,This movie was absolutely fantastic.,1
+simple,I loved every minute of this film.,1
+simple,The acting was brilliant and the story was engaging.,1
+simple,This was one of the best movies I have seen.,1
+simple,A wonderful film with excellent performances.,1
+simple,The movie was entertaining from beginning to end.,1
+simple,I really enjoyed this movie.,1
+simple,The story was beautiful and incredibly moving.,1
+simple,An excellent movie that I would happily watch again.,1
+simple,The performances were outstanding.,1
+simple,This movie was absolutely terrible.,0
+simple,I hated every minute of this film.,0
+simple,The acting was awful and the story was boring.,0
+simple,This was one of the worst movies I have seen.,0
+simple,A dreadful film with terrible performances.,0
+simple,The movie was boring from beginning to end.,0
+simple,I really disliked this movie.,0
+simple,The story was painfully dull and predictable.,0
+simple,A terrible movie that I would never watch again.,0
+simple,The performances were embarrassing.,0
+negation,This movie was not bad at all.,1
+negation,I cannot say that I disliked this film.,1
+negation,This was not a disappointing movie.,1
+negation,The performances were not terrible.,1
+negation,I would not call this movie boring.,1
+negation,The film was not nearly as bad as I expected.,1
+negation,I did not hate this movie.,1
+negation,It is difficult not to enjoy this film.,1
+negation,I cannot deny that this was a good movie.,1
+negation,There is nothing bad about the performances.,1
+negation,This movie was not good at all.,0
+negation,I cannot say that I enjoyed this film.,0
+negation,This was not an enjoyable movie.,0
+negation,The performances were not impressive.,0
+negation,I would not call this movie entertaining.,0
+negation,The film was not nearly as good as I expected.,0
+negation,I did not enjoy this movie.,0
+negation,It is difficult to like this film.,0
+negation,I cannot pretend that this was a good movie.,0
+negation,There is nothing enjoyable about the performances.,0
+mixed,"The story was predictable, but the performances were so good that I still loved the movie.",1
+mixed,"The first half was slow, but the second half was absolutely fantastic.",1
+mixed,"The dialogue was weak, although the story and acting were excellent.",1
+mixed,"It has several flaws, but overall this is a very enjoyable film.",1
+mixed,"The villain was disappointing, but everything else about the movie was wonderful.",1
+mixed,"The beginning was boring, yet the ending made the entire movie worthwhile.",1
+mixed,"Some scenes dragged on too long, but I still really enjoyed the film.",1
+mixed,"The plot was simple, but the characters were charming and memorable.",1
+mixed,"The movie is far from perfect, but I would happily watch it again.",1
+mixed,"Despite a weak opening, this turned into a surprisingly excellent movie.",1
+mixed,"The acting was excellent, but the story was so terrible that I hated the movie.",0
+mixed,"The first half was interesting, but the second half was painfully boring.",0
+mixed,"The visuals were beautiful, although the movie itself was awful.",0
+mixed,"There were a few good scenes, but overall this was a terrible film.",0
+mixed,"The lead actor was great, but everything else was disappointing.",0
+mixed,"The movie started well, yet the ending completely ruined it.",0
+mixed,"I liked the soundtrack, but I would never watch this movie again.",0
+mixed,"The characters were interesting, but the plot was painfully dull.",0
+mixed,"The movie had potential, but ultimately it was a huge disappointment.",0
+mixed,"Despite some impressive acting, this was an incredibly boring movie.",0
+sarcasm,"Fantastic, another two hours of my life I will never get back.",0
+sarcasm,"What a masterpiece, if the goal was to put me to sleep.",0
+sarcasm,"Brilliant movie, I especially loved checking the time every five minutes.",0
+sarcasm,"Absolutely wonderful, because apparently movies do not need a plot anymore.",0
+sarcasm,"Amazing performance, I almost believed the actors wanted to be there.",0
+sarcasm,"Great job, the movie managed to make ninety minutes feel like four hours.",0
+sarcasm,I loved how the story made absolutely no sense whatsoever.,0
+sarcasm,"A truly unforgettable film, unfortunately for all the wrong reasons.",0
+sarcasm,Perfect movie for anyone who has trouble falling asleep.,0
+sarcasm,"Oscar worthy stuff, assuming the Oscars now reward terrible acting.",0
+sarcasm,Terrible job making a movie so good that I stayed up far too late finishing it.,1
+sarcasm,"Just awful, now every other movie I watch is going to seem disappointing by comparison.",1
+sarcasm,How dare they make characters this enjoyable to watch.,1
+sarcasm,I hate that this movie was so good because now I have to recommend it to everyone.,1
+sarcasm,"What a disaster, I accidentally enjoyed every single minute.",1
+sarcasm,"Absolutely dreadful, now I cannot stop thinking about how brilliant the ending was.",1
+sarcasm,"Worst experience ever, I laughed so much my face hurt.",1
+sarcasm,"Thanks a lot, now I have to watch this fantastic movie again.",1
+sarcasm,Really annoying how good the performances were.,1
+sarcasm,I am furious that this movie completely exceeded my expectations.,1

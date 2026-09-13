@@ -1,0 +1,81 @@
+category,text,label,clean_text,rnn_score,lstm_score,gru_score,rnn_prediction,lstm_prediction,gru_prediction,models_agree
+simple,This movie was absolutely fantastic.,1,this movie was absolutely fantastic,0.5611487,0.6357788,0.8609164,1,1,1,True
+simple,I loved every minute of this film.,1,i loved every minute of this film,0.89172083,0.63162017,0.8029642,1,1,1,True
+simple,The acting was brilliant and the story was engaging.,1,the acting was brilliant and the story was engaging,0.2805895,0.6560904,0.8535687,0,1,1,False
+simple,This was one of the best movies I have seen.,1,this was one of the best movies i have seen,0.70937616,0.6739545,0.78374904,1,1,1,True
+simple,A wonderful film with excellent performances.,1,a wonderful film with excellent performances,0.97829974,0.8548984,0.9880855,1,1,1,True
+simple,The movie was entertaining from beginning to end.,1,the movie was entertaining from beginning to end,0.48894137,0.64719325,0.85738873,0,1,1,False
+simple,I really enjoyed this movie.,1,i really enjoyed this movie,0.8554974,0.57019895,0.8472708,1,1,1,True
+simple,The story was beautiful and incredibly moving.,1,the story was beautiful and incredibly moving,0.7409265,0.6249632,0.90557694,1,1,1,True
+simple,An excellent movie that I would happily watch again.,1,an excellent movie that i would happily watch again,0.7872612,0.61592543,0.8857614,1,1,1,True
+simple,The performances were outstanding.,1,the performances were outstanding,0.9157657,0.70427185,0.84394455,1,1,1,True
+simple,This movie was absolutely terrible.,0,this movie was absolutely terrible,0.025322078,0.21188132,0.043747615,0,0,0,True
+simple,I hated every minute of this film.,0,i hated every minute of this film,0.09808653,0.36599195,0.21735458,0,0,0,True
+simple,The acting was awful and the story was boring.,0,the acting was awful and the story was boring,0.010587817,0.08744046,0.005960133,0,0,0,True
+simple,This was one of the worst movies I have seen.,0,this was one of the worst movies i have seen,0.14845324,0.17098153,0.04885488,0,0,0,True
+simple,A dreadful film with terrible performances.,0,a dreadful film with terrible performances,0.16503696,0.24784292,0.11558815,0,0,0,True
+simple,The movie was boring from beginning to end.,0,the movie was boring from beginning to end,0.1684923,0.27768084,0.07618313,0,0,0,True
+simple,I really disliked this movie.,0,i really disliked this movie,0.23818809,0.39251807,0.27560738,0,0,0,True
+simple,The story was painfully dull and predictable.,0,the story was painfully dull and predictable,0.011425524,0.114487946,0.01924531,0,0,0,True
+simple,A terrible movie that I would never watch again.,0,a terrible movie that i would never watch again,0.037807327,0.27248314,0.11022344,0,0,0,True
+simple,The performances were embarrassing.,0,the performances were embarrassing,0.23080139,0.384371,0.3322805,0,0,0,True
+negation,This movie was not bad at all.,1,this movie was not bad at all,0.041548934,0.20095511,0.19383852,0,0,0,True
+negation,I cannot say that I disliked this film.,1,i cannot say that i disliked this film,0.3550914,0.38192585,0.2878847,0,0,0,True
+negation,This was not a disappointing movie.,1,this was not a disappointing movie,0.03210253,0.21092378,0.14085245,0,0,0,True
+negation,The performances were not terrible.,1,the performances were not terrible,0.1577817,0.2583629,0.2297521,0,0,0,True
+negation,I would not call this movie boring.,1,i would not call this movie boring,0.027230317,0.120311595,0.051034,0,0,0,True
+negation,The film was not nearly as bad as I expected.,1,the film was not nearly as bad as i expected,0.043746196,0.20550738,0.18059368,0,0,0,True
+negation,I did not hate this movie.,1,i did not hate this movie,0.081040844,0.36666384,0.37958044,0,0,0,True
+negation,It is difficult not to enjoy this film.,1,it is difficult not to enjoy this film,0.92785287,0.6064302,0.65752965,1,1,1,True
+negation,I cannot deny that this was a good movie.,1,i cannot deny that this was a good movie,0.25607964,0.5695046,0.59232813,0,1,1,False
+negation,There is nothing bad about the performances.,1,there is nothing bad about the performances,0.16401175,0.20565255,0.2748285,0,0,0,True
+negation,This movie was not good at all.,0,this movie was not good at all,0.15378326,0.42112315,0.4418902,0,0,0,True
+negation,I cannot say that I enjoyed this film.,0,i cannot say that i enjoyed this film,0.85217756,0.54580176,0.66375333,1,1,1,True
+negation,This was not an enjoyable movie.,0,this was not an enjoyable movie,0.30537492,0.6043703,0.7765141,0,1,1,False
+negation,The performances were not impressive.,0,the performances were not impressive,0.8620895,0.6252429,0.6570194,1,1,1,True
+negation,I would not call this movie entertaining.,0,i would not call this movie entertaining,0.46416327,0.38542804,0.6637042,0,0,1,False
+negation,The film was not nearly as good as I expected.,0,the film was not nearly as good as i expected,0.16580746,0.41650274,0.37934238,0,0,0,True
+negation,I did not enjoy this movie.,0,i did not enjoy this movie,0.6355276,0.546689,0.49969682,1,1,0,False
+negation,It is difficult to like this film.,0,it is difficult to like this film,0.8831132,0.47309652,0.60825247,1,0,1,False
+negation,I cannot pretend that this was a good movie.,0,i cannot pretend that this was a good movie,0.6757444,0.45073092,0.5617594,1,0,1,False
+negation,There is nothing enjoyable about the performances.,0,there is nothing enjoyable about the performances,0.5452418,0.5738113,0.733622,1,1,1,True
+mixed,"The story was predictable, but the performances were so good that I still loved the movie.",1,the story was predictable but the performances were so good that i still loved the movie,0.62388897,0.7555786,0.86560416,1,1,1,True
+mixed,"The first half was slow, but the second half was absolutely fantastic.",1,the first half was slow but the second half was absolutely fantastic,0.2452691,0.4275115,0.58754724,0,0,1,False
+mixed,"The dialogue was weak, although the story and acting were excellent.",1,the dialogue was weak although the story and acting were excellent,0.6098436,0.34976318,0.76715297,1,0,1,False
+mixed,"It has several flaws, but overall this is a very enjoyable film.",1,it has several flaws but overall this is a very enjoyable film,0.9388783,0.8703074,0.9849839,1,1,1,True
+mixed,"The villain was disappointing, but everything else about the movie was wonderful.",1,the villain was disappointing but everything else about the movie was wonderful,0.32939222,0.41963896,0.5228832,0,0,1,False
+mixed,"The beginning was boring, yet the ending made the entire movie worthwhile.",1,the beginning was boring yet the ending made the entire movie worthwhile,0.08006218,0.22812802,0.08564193,0,0,0,True
+mixed,"Some scenes dragged on too long, but I still really enjoyed the film.",1,some scenes dragged on too long but i still really enjoyed the film,0.9431112,0.6470822,0.9166076,1,1,1,True
+mixed,"The plot was simple, but the characters were charming and memorable.",1,the plot was simple but the characters were charming and memorable,0.22712798,0.49794114,0.85197157,0,0,1,False
+mixed,"The movie is far from perfect, but I would happily watch it again.",1,the movie is far from perfect but i would happily watch it again,0.27399322,0.7080279,0.72336626,0,1,1,False
+mixed,"Despite a weak opening, this turned into a surprisingly excellent movie.",1,despite a weak opening this turned into a surprisingly excellent movie,0.6870095,0.63962835,0.93119526,1,1,1,True
+mixed,"The acting was excellent, but the story was so terrible that I hated the movie.",0,the acting was excellent but the story was so terrible that i hated the movie,0.104737155,0.24102873,0.28026643,0,0,0,True
+mixed,"The first half was interesting, but the second half was painfully boring.",0,the first half was interesting but the second half was painfully boring,0.009151587,0.07695549,0.0098028295,0,0,0,True
+mixed,"The visuals were beautiful, although the movie itself was awful.",0,the visuals were beautiful although the movie itself was awful,0.05462259,0.3230336,0.060661323,0,0,0,True
+mixed,"There were a few good scenes, but overall this was a terrible film.",0,there were a few good scenes but overall this was a terrible film,0.06815566,0.26076338,0.08765111,0,0,0,True
+mixed,"The lead actor was great, but everything else was disappointing.",0,the lead actor was great but everything else was disappointing,0.034524146,0.31689838,0.18729167,0,0,0,True
+mixed,"The movie started well, yet the ending completely ruined it.",0,the movie started well yet the ending completely ruined it,0.16793469,0.40895358,0.4662274,0,0,0,True
+mixed,"I liked the soundtrack, but I would never watch this movie again.",0,i liked the soundtrack but i would never watch this movie again,0.7122782,0.61659336,0.532275,1,1,1,True
+mixed,"The characters were interesting, but the plot was painfully dull.",0,the characters were interesting but the plot was painfully dull,0.010959047,0.09081674,0.015254746,0,0,0,True
+mixed,"The movie had potential, but ultimately it was a huge disappointment.",0,the movie had potential but ultimately it was a huge disappointment,0.0075315316,0.255125,0.04264946,0,0,0,True
+mixed,"Despite some impressive acting, this was an incredibly boring movie.",0,despite some impressive acting this was an incredibly boring movie,0.056566775,0.16001639,0.07726044,0,0,0,True
+sarcasm,"Fantastic, another two hours of my life I will never get back.",0,fantastic another two hours of my life i will never get back,0.86951315,0.76183486,0.79452616,1,1,1,True
+sarcasm,"What a masterpiece, if the goal was to put me to sleep.",0,what a masterpiece if the goal was to put me to sleep,0.21282521,0.45889658,0.5288634,0,0,1,False
+sarcasm,"Brilliant movie, I especially loved checking the time every five minutes.",0,brilliant movie i especially loved checking the time every five minutes,0.74540406,0.61133116,0.90803605,1,1,1,True
+sarcasm,"Absolutely wonderful, because apparently movies do not need a plot anymore.",0,absolutely wonderful because apparently movies do not need a plot anymore,0.61049527,0.4765478,0.7042578,1,0,1,False
+sarcasm,"Amazing performance, I almost believed the actors wanted to be there.",0,amazing performance i almost believed the actors wanted to be there,0.89312804,0.5234176,0.7768705,1,1,1,True
+sarcasm,"Great job, the movie managed to make ninety minutes feel like four hours.",0,great job the movie managed to make ninety minutes feel like four hours,0.8844558,0.41485277,0.6164949,1,0,1,False
+sarcasm,I loved how the story made absolutely no sense whatsoever.,0,i loved how the story made absolutely no sense whatsoever,0.30701295,0.36693916,0.37226367,0,0,0,True
+sarcasm,"A truly unforgettable film, unfortunately for all the wrong reasons.",0,a truly unforgettable film unfortunately for all the wrong reasons,0.34881577,0.3107659,0.3572827,0,0,0,True
+sarcasm,Perfect movie for anyone who has trouble falling asleep.,0,perfect movie for anyone who has trouble falling asleep,0.84575534,0.5433669,0.63918674,1,1,1,True
+sarcasm,"Oscar worthy stuff, assuming the Oscars now reward terrible acting.",0,oscar worthy stuff assuming the oscars now reward terrible acting,0.21629001,0.2663337,0.20626584,0,0,0,True
+sarcasm,Terrible job making a movie so good that I stayed up far too late finishing it.,1,terrible job making a movie so good that i stayed up far too late finishing it,0.06022526,0.3809561,0.17383751,0,0,0,True
+sarcasm,"Just awful, now every other movie I watch is going to seem disappointing by comparison.",1,just awful now every other movie i watch is going to seem disappointing by comparison,0.040915094,0.14492983,0.01751406,0,0,0,True
+sarcasm,How dare they make characters this enjoyable to watch.,1,how dare they make characters this enjoyable to watch,0.5321347,0.66899717,0.81223005,1,1,1,True
+sarcasm,I hate that this movie was so good because now I have to recommend it to everyone.,1,i hate that this movie was so good because now i have to recommend it to everyone,0.6294378,0.71256965,0.7961794,1,1,1,True
+sarcasm,"What a disaster, I accidentally enjoyed every single minute.",1,what a disaster i accidentally enjoyed every single minute,0.3680413,0.41879886,0.65460116,0,0,1,False
+sarcasm,"Absolutely dreadful, now I cannot stop thinking about how brilliant the ending was.",1,absolutely dreadful now i cannot stop thinking about how brilliant the ending was,0.031959377,0.5155864,0.3119148,0,1,0,False
+sarcasm,"Worst experience ever, I laughed so much my face hurt.",1,worst experience ever i laughed so much my face hurt,0.050509308,0.2694052,0.12846525,0,0,0,True
+sarcasm,"Thanks a lot, now I have to watch this fantastic movie again.",1,thanks a lot now i have to watch this fantastic movie again,0.9253129,0.7453216,0.87433213,1,1,1,True
+sarcasm,Really annoying how good the performances were.,1,really annoying how good the performances were,0.23428653,0.43525952,0.37251198,0,0,0,True
+sarcasm,I am furious that this movie completely exceeded my expectations.,1,i am furious that this movie completely exceeded my expectations,0.17783412,0.35659012,0.32696632,0,0,0,True
