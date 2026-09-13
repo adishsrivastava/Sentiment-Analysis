@@ -596,6 +596,92 @@ def model_info():
         model_metadata
     )
 
+# ============================================================
+# CHALLENGE BENCHMARK API
+# ============================================================
+
+@app.route("/benchmark")
+def benchmark():
+
+    categories = [
+        "simple",
+        "mixed",
+        "negation",
+        "sarcasm"
+    ]
+
+    summary = {}
+
+    for category in categories:
+
+        examples = [
+            item
+            for item in challenge_results
+            if item["category"] == category
+        ]
+
+        summary[category] = {
+
+            "count":
+                len(examples),
+
+            "simple_rnn":
+                round(
+                    sum(
+                        item["models"]["simple_rnn"]["correct"]
+                        for item in examples
+                    )
+                    / len(examples)
+                    * 100,
+                    2
+                ),
+
+            "lstm":
+                round(
+                    sum(
+                        item["models"]["lstm"]["correct"]
+                        for item in examples
+                    )
+                    / len(examples)
+                    * 100,
+                    2
+                ),
+
+            "gru":
+                round(
+                    sum(
+                        item["models"]["gru"]["correct"]
+                        for item in examples
+                    )
+                    / len(examples)
+                    * 100,
+                    2
+                )
+        }
+
+
+    hall_of_shame = [
+        item
+        for item in challenge_results
+        if item["all_failed"]
+    ]
+
+
+    return jsonify({
+
+        "total_examples":
+            len(challenge_results),
+
+        "summary":
+            summary,
+
+        "examples":
+            challenge_results,
+
+        "hall_of_shame":
+            hall_of_shame
+
+    })
 
 # ============================================================
 # SINGLE MODEL PREDICTION
