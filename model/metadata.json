@@ -1,0 +1,50 @@
+{
+    "experiment": {
+        "version": "3.0",
+        "dataset": "IMDb Movie Reviews",
+        "original_reviews": 50000,
+        "duplicates_removed": 418,
+        "usable_reviews": 49582,
+        "training_samples": 39665,
+        "testing_samples": 9917,
+        "vocabulary_size": 10000,
+        "sequence_length": 200,
+        "embedding_dimension": 64,
+        "recurrent_units": 64,
+        "dense_units": 32,
+        "batch_size": 64,
+        "random_seed": 42
+    },
+    "models": {
+        "simple_rnn": {
+            "name": "SimpleRNN",
+            "accuracy": 81.36,
+            "test_loss": 0.4727,
+            "macro_f1": 81.33,
+            "best_epoch": 7,
+            "epochs_completed": 9,
+            "training_seconds": 591.75,
+            "parameters": 650369
+        },
+        "lstm": {
+            "name": "LSTM",
+            "accuracy": 85.29,
+            "test_loss": 0.3445,
+            "macro_f1": 85.25,
+            "best_epoch": 1,
+            "epochs_completed": 3,
+            "training_seconds": 388.69,
+            "parameters": 675137
+        },
+        "gru": {
+            "name": "GRU",
+            "accuracy": 87.08,
+            "test_loss": 0.3264,
+            "macro_f1": 87.06,
+            "best_epoch": 2,
+            "epochs_completed": 4,
+            "training_seconds": 537.06,
+            "parameters": 667073
+        }
+    }
+}
