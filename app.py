@@ -405,6 +405,147 @@ def get_request_text():
 
     return text, None
 
+# ============================================================
+# LOAD CHALLENGE BENCHMARK
+# ============================================================
+
+def load_challenge_results():
+
+    results = []
+
+    with open(
+        BENCHMARK_RESULTS_PATH,
+        "r",
+        encoding="utf-8"
+    ) as file:
+
+        reader = csv.DictReader(file)
+
+        for row in reader:
+
+            actual_label = int(
+                float(row["label"])
+            )
+
+            rnn_prediction = int(
+                float(row["rnn_prediction"])
+            )
+
+            lstm_prediction = int(
+                float(row["lstm_prediction"])
+            )
+
+            gru_prediction = int(
+                float(row["gru_prediction"])
+            )
+
+            result = {
+
+                "category": row["category"],
+                "text": row["text"],
+
+                "actual_label": actual_label,
+
+                "actual_sentiment":
+                    "Positive"
+                    if actual_label == 1
+                    else "Negative",
+
+                "models": {
+
+                    "simple_rnn": {
+                        "prediction": rnn_prediction,
+
+                        "sentiment":
+                            "Positive"
+                            if rnn_prediction == 1
+                            else "Negative",
+
+                        "score": round(
+                            float(row["rnn_score"]) * 100,
+                            2
+                        ),
+
+                        "correct":
+                            rnn_prediction == actual_label
+                    },
+
+                    "lstm": {
+                        "prediction": lstm_prediction,
+
+                        "sentiment":
+                            "Positive"
+                            if lstm_prediction == 1
+                            else "Negative",
+
+                        "score": round(
+                            float(row["lstm_score"]) * 100,
+                            2
+                        ),
+
+                        "correct":
+                            lstm_prediction == actual_label
+                    },
+
+                    "gru": {
+                        "prediction": gru_prediction,
+
+                        "sentiment":
+                            "Positive"
+                            if gru_prediction == 1
+                            else "Negative",
+
+                        "score": round(
+                            float(row["gru_score"]) * 100,
+                            2
+                        ),
+
+                        "correct":
+                            gru_prediction == actual_label
+                    }
+                }
+            }
+
+            result["all_failed"] = (
+                not result["models"]["simple_rnn"]["correct"]
+                and
+                not result["models"]["lstm"]["correct"]
+                and
+                not result["models"]["gru"]["correct"]
+            )
+
+            result["models_agree"] = (
+                rnn_prediction
+                ==
+                lstm_prediction
+                ==
+                gru_prediction
+            )
+
+            results.append(result)
+
+    return results
+
+
+# Load benchmark when application starts
+challenge_results = load_challenge_results()
+
+print(
+    f"Loaded {len(challenge_results)} "
+    f"challenge benchmark examples."
+)
+
+
+# ============================================================
+# HOME
+# ============================================================
+
+@app.route("/")
+def home():
+
+    return render_template(
+        "index.html"
+    )
 
 # ============================================================
 # HOME
