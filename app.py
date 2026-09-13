@@ -94,6 +94,12 @@ METADATA_PATH = os.path.join(
     "metadata.json"
 )
 
+BENCHMARK_RESULTS_PATH = os.path.join(
+    BASE_DIR,
+    "benchmarks",
+    "challenge_results.csv"
+)
+
 
 # ============================================================
 # LOAD TOKENIZER
