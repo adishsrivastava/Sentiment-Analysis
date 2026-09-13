@@ -1,118 +1,169 @@
 # ============================================================
-# RNN SENTIMENT ANALYSIS WEB APPLICATION
+# SENTIMENT LAB V3
+#
+# SimpleRNN vs LSTM vs GRU
 # ============================================================
 
 import os
 import re
+import json
 import pickle
+import time
 
 import tensorflow as tf
 
-from flask import Flask, render_template, request, jsonify
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify
+)
+
+from tensorflow.keras.preprocessing.sequence import (
+    pad_sequences
+)
 
 
 # ============================================================
-# FLASK APPLICATION
+# FLASK
 # ============================================================
 
 app = Flask(__name__)
 
 
 # ============================================================
-# MODEL CONFIGURATION
+# CONFIGURATION
 #
-# These values MUST match the values used during training.
+# Must match V3 training configuration.
 # ============================================================
 
 MAX_LENGTH = 200
 
+MODEL_NAMES = {
+    "simple_rnn": "SimpleRNN",
+    "lstm": "LSTM",
+    "gru": "GRU"
+}
+
 
 # ============================================================
-# FILE PATHS
-#
-# Absolute paths make loading reliable both:
-# - locally
-# - on Vercel
+# PATHS
 # ============================================================
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-MODEL_PATH = os.path.join(
-    BASE_DIR,
-    "model",
-    "sentiment_rnn.keras"
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
 )
 
-TOKENIZER_PATH = os.path.join(
+MODEL_DIR = os.path.join(
     BASE_DIR,
-    "model",
+    "model"
+)
+
+
+MODEL_PATHS = {
+
+    "simple_rnn":
+        os.path.join(
+            MODEL_DIR,
+            "simple_rnn.keras"
+        ),
+
+    "lstm":
+        os.path.join(
+            MODEL_DIR,
+            "lstm.keras"
+        ),
+
+    "gru":
+        os.path.join(
+            MODEL_DIR,
+            "gru.keras"
+        )
+}
+
+
+TOKENIZER_PATH = os.path.join(
+    MODEL_DIR,
     "tokenizer.pkl"
 )
 
 
-# ============================================================
-# LOAD TRAINED MODEL
-# ============================================================
-
-print("Loading RNN sentiment model...")
-
-try:
-
-    model = tf.keras.models.load_model(
-        MODEL_PATH,
-        compile=False
-    )
-
-    print("Model loaded successfully.")
-
-except Exception as error:
-
-    print("ERROR: Could not load model.")
-    print(error)
-
-    raise
+METADATA_PATH = os.path.join(
+    MODEL_DIR,
+    "metadata.json"
+)
 
 
 # ============================================================
 # LOAD TOKENIZER
 # ============================================================
 
-print("Loading tokenizer...")
+print("Loading V3 tokenizer...")
 
-try:
+with open(
+    TOKENIZER_PATH,
+    "rb"
+) as file:
 
-    with open(
-        TOKENIZER_PATH,
-        "rb"
-    ) as file:
+    tokenizer = pickle.load(file)
 
-        tokenizer = pickle.load(file)
-
-    print("Tokenizer loaded successfully.")
-
-except Exception as error:
-
-    print("ERROR: Could not load tokenizer.")
-    print(error)
-
-    raise
+print("Tokenizer loaded.")
 
 
 # ============================================================
-# TEXT PREPROCESSING
+# LOAD MODEL METADATA
+# ============================================================
+
+print("Loading model metadata...")
+
+with open(
+    METADATA_PATH,
+    "r"
+) as file:
+
+    model_metadata = json.load(file)
+
+print("Metadata loaded.")
+
+
+# ============================================================
+# LOAD ALL THREE MODELS
+# ============================================================
+
+models = {}
+
+for model_key, model_path in MODEL_PATHS.items():
+
+    print(
+        f"Loading {MODEL_NAMES[model_key]}..."
+    )
+
+    models[model_key] = (
+        tf.keras.models.load_model(
+            model_path,
+            compile=False
+        )
+    )
+
+    print(
+        f"{MODEL_NAMES[model_key]} loaded."
+    )
+
+
+print("All V3 models loaded successfully.")
+
+
+# ============================================================
+# TEXT CLEANING
 #
-# IMPORTANT:
-# This preprocessing is intentionally identical to the
-# preprocessing used while training the RNN.
+# Must remain identical to V3 training preprocessing.
 # ============================================================
 
 def clean_text(text):
 
-    # Convert input to string and lowercase it
     text = str(text).lower()
 
-    # Remove HTML tags
+    # Remove HTML
     text = re.sub(
         r"<.*?>",
         " ",
@@ -126,14 +177,14 @@ def clean_text(text):
         text
     )
 
-    # Keep only English letters and spaces
+    # Keep English letters and spaces
     text = re.sub(
         r"[^a-z\s]",
         " ",
         text
     )
 
-    # Replace repeated whitespace with a single space
+    # Collapse whitespace
     text = re.sub(
         r"\s+",
         " ",
@@ -144,34 +195,18 @@ def clean_text(text):
 
 
 # ============================================================
-# SENTIMENT PREDICTION
+# PREPROCESS TEXT
 # ============================================================
 
-def predict_sentiment(text):
-
-    # --------------------------------------------------------
-    # STEP 1: Clean input
-    # --------------------------------------------------------
+def preprocess_text(text):
 
     cleaned = clean_text(text)
-
-
-    # --------------------------------------------------------
-    # STEP 2: Convert text into tokenizer IDs
-    # --------------------------------------------------------
 
     sequence = tokenizer.texts_to_sequences(
         [cleaned]
     )
 
     token_ids = sequence[0]
-
-
-    # --------------------------------------------------------
-    # STEP 3: Pad/truncate sequence
-    #
-    # The RNN was trained using sequences of length 200.
-    # --------------------------------------------------------
 
     padded = pad_sequences(
         sequence,
@@ -180,50 +215,18 @@ def predict_sentiment(text):
         truncating="post"
     )
 
-
-    # --------------------------------------------------------
-    # STEP 4: Run RNN inference
-    #
-    # The sigmoid output represents the probability of the
-    # positive class.
-    # --------------------------------------------------------
-
-    prediction = model.predict(
-        padded,
-        verbose=0
-    )
-
-    probability = float(
-        prediction[0][0]
+    return (
+        cleaned,
+        token_ids,
+        padded
     )
 
 
-    # --------------------------------------------------------
-    # STEP 5: Convert probability into sentiment
-    # --------------------------------------------------------
+# ============================================================
+# TOKEN VISUALIZATION
+# ============================================================
 
-    if probability >= 0.5:
-
-        sentiment = "Positive"
-
-        confidence = probability
-
-    else:
-
-        sentiment = "Negative"
-
-        confidence = 1 - probability
-
-
-    # --------------------------------------------------------
-    # STEP 6: Create token visualization
-    #
-    # This powers:
-    #
-    # "How the model sees your text"
-    #
-    # on the frontend.
-    # --------------------------------------------------------
+def build_token_data(token_ids):
 
     index_word = tokenizer.index_word
 
@@ -231,70 +234,173 @@ def predict_sentiment(text):
 
     for token_id in token_ids[:50]:
 
-        word = index_word.get(
-            token_id,
-            "<OOV>"
-        )
+        tokens.append({
+            "word": index_word.get(
+                token_id,
+                "<OOV>"
+            ),
+            "id": int(token_id)
+        })
 
-        tokens.append(
-            {
-                "word": word,
-                "id": int(token_id)
-            }
-        )
+    return tokens
 
 
-    # --------------------------------------------------------
-    # STEP 7: Return prediction + explanation
-    # --------------------------------------------------------
+# ============================================================
+# RUN ONE MODEL
+# ============================================================
+
+def run_model(
+    model_key,
+    padded
+):
+
+    model = models[model_key]
+
+    start_time = time.perf_counter()
+
+    prediction = model.predict(
+        padded,
+        verbose=0
+    )
+
+    elapsed_ms = (
+        time.perf_counter() -
+        start_time
+    ) * 1000
+
+
+    positive_score = float(
+        prediction[0][0]
+    )
+
+    negative_score = (
+        1 - positive_score
+    )
+
+
+    if positive_score >= 0.5:
+
+        sentiment = "Positive"
+
+    else:
+
+        sentiment = "Negative"
+
 
     return {
+
+        "model":
+            MODEL_NAMES[model_key],
+
+        "model_key":
+            model_key,
 
         "sentiment":
             sentiment,
 
-        "confidence":
+        "positive_score":
             round(
-                confidence * 100,
+                positive_score * 100,
                 2
             ),
 
-        "positive_probability":
+        "negative_score":
             round(
-                probability * 100,
+                negative_score * 100,
                 2
             ),
 
-        "negative_probability":
+        "inference_ms":
             round(
-                (1 - probability) * 100,
+                elapsed_ms,
                 2
-            ),
-
-        "analysis": {
-
-            "original":
-                text,
-
-            "cleaned":
-                cleaned,
-
-            "tokens":
-                tokens,
-
-            "token_count":
-                len(token_ids),
-
-            "sequence_length":
-                MAX_LENGTH
-
-        }
+            )
 
     }
 
 
 # ============================================================
-# HOME PAGE
+# VALIDATE REQUEST TEXT
+# ============================================================
+
+def get_request_text():
+
+    if not request.is_json:
+
+        return None, (
+            jsonify({
+                "error":
+                    "Request must contain JSON."
+            }),
+            400
+        )
+
+
+    data = request.get_json(
+        silent=True
+    )
+
+
+    if not data:
+
+        return None, (
+            jsonify({
+                "error":
+                    "No request data provided."
+            }),
+            400
+        )
+
+
+    text = data.get(
+        "text"
+    )
+
+
+    if not isinstance(
+        text,
+        str
+    ):
+
+        return None, (
+            jsonify({
+                "error":
+                    "Text must be a string."
+            }),
+            400
+        )
+
+
+    text = text.strip()
+
+
+    if not text:
+
+        return None, (
+            jsonify({
+                "error":
+                    "Please enter some text."
+            }),
+            400
+        )
+
+
+    if len(text) > 2000:
+
+        return None, (
+            jsonify({
+                "error":
+                    "Text must be 2000 characters or fewer."
+            }),
+            400
+        )
+
+
+    return text, None
+
+
+# ============================================================
+# HOME
 # ============================================================
 
 @app.route("/")
@@ -306,155 +412,112 @@ def home():
 
 
 # ============================================================
-# HEALTH CHECK
-#
-# Useful for confirming that the deployed Flask application
-# is alive without running model inference.
-#
-# Visit:
-# /health
+# HEALTH
 # ============================================================
 
 @app.route("/health")
 def health():
 
+    return jsonify({
+
+        "status":
+            "ok",
+
+        "version":
+            "3.0",
+
+        "models": [
+            "SimpleRNN",
+            "LSTM",
+            "GRU"
+        ]
+
+    })
+
+
+# ============================================================
+# MODEL METADATA API
+#
+# GET /models
+# ============================================================
+
+@app.route("/models")
+def model_info():
+
     return jsonify(
-        {
-            "status": "ok",
-            "model": "SimpleRNN",
-            "task": "sentiment-analysis"
-        }
+        model_metadata
     )
 
 
 # ============================================================
-# PREDICTION API
+# SINGLE MODEL PREDICTION
 #
-# POST /predict
+# POST /predict/<model_key>
 #
-# Expected JSON:
+# Example:
 #
-# {
-#     "text": "This movie was amazing!"
-# }
+# /predict/simple_rnn
+# /predict/lstm
+# /predict/gru
 # ============================================================
 
 @app.route(
-    "/predict",
+    "/predict/<model_key>",
     methods=["POST"]
 )
-def predict():
+def predict_single(model_key):
 
-    # --------------------------------------------------------
-    # Make sure request contains JSON
-    # --------------------------------------------------------
+    if model_key not in models:
 
-    if not request.is_json:
-
-        return jsonify(
-            {
-                "error":
-                    "Request must contain JSON."
-            }
-        ), 400
+        return jsonify({
+            "error":
+                "Unknown model."
+        }), 404
 
 
-    # --------------------------------------------------------
-    # Read JSON safely
-    # --------------------------------------------------------
+    text, error = get_request_text()
 
-    data = request.get_json(
-        silent=True
-    )
+    if error:
 
+        return error
 
-    if not data:
-
-        return jsonify(
-            {
-                "error":
-                    "No request data provided."
-            }
-        ), 400
-
-
-    # --------------------------------------------------------
-    # Check for text field
-    # --------------------------------------------------------
-
-    if "text" not in data:
-
-        return jsonify(
-            {
-                "error":
-                    "No text provided."
-            }
-        ), 400
-
-
-    # --------------------------------------------------------
-    # Validate input type
-    # --------------------------------------------------------
-
-    text = data["text"]
-
-
-    if not isinstance(
-        text,
-        str
-    ):
-
-        return jsonify(
-            {
-                "error":
-                    "Text must be a string."
-            }
-        ), 400
-
-
-    # --------------------------------------------------------
-    # Remove surrounding whitespace
-    # --------------------------------------------------------
-
-    text = text.strip()
-
-
-    if not text:
-
-        return jsonify(
-            {
-                "error":
-                    "Please enter some text."
-            }
-        ), 400
-
-
-    # --------------------------------------------------------
-    # Prevent unnecessarily huge requests
-    #
-    # Frontend currently limits text to 2000 characters.
-    # Backend should enforce the same limit.
-    # --------------------------------------------------------
-
-    if len(text) > 2000:
-
-        return jsonify(
-            {
-                "error":
-                    "Text must be 2000 characters or fewer."
-            }
-        ), 400
-
-
-    # --------------------------------------------------------
-    # Run sentiment analysis
-    # --------------------------------------------------------
 
     try:
 
-        result = predict_sentiment(
-            text
+        (
+            cleaned,
+            token_ids,
+            padded
+        ) = preprocess_text(text)
+
+
+        result = run_model(
+            model_key,
+            padded
         )
+
+
+        result["analysis"] = {
+
+            "original":
+                text,
+
+            "cleaned":
+                cleaned,
+
+            "tokens":
+                build_token_data(
+                    token_ids
+                ),
+
+            "token_count":
+                len(token_ids),
+
+            "sequence_length":
+                MAX_LENGTH
+
+        }
+
 
         return jsonify(
             result
@@ -468,35 +531,275 @@ def predict():
             error
         )
 
-        return jsonify(
-            {
-                "error":
-                    "The model could not process this text."
-            }
-        ), 500
+        return jsonify({
+            "error":
+                "The model could not process this text."
+        }), 500
 
 
 # ============================================================
-# 404 HANDLER
+# COMPARE ALL MODELS
+#
+# POST /compare
+# ============================================================
+
+@app.route(
+    "/compare",
+    methods=["POST"]
+)
+def compare_models():
+
+    text, error = get_request_text()
+
+    if error:
+
+        return error
+
+
+    try:
+
+        (
+            cleaned,
+            token_ids,
+            padded
+        ) = preprocess_text(text)
+
+
+        results = {}
+
+
+        for model_key in [
+            "simple_rnn",
+            "lstm",
+            "gru"
+        ]:
+
+            results[model_key] = (
+                run_model(
+                    model_key,
+                    padded
+                )
+            )
+
+
+        sentiments = [
+            result["sentiment"]
+            for result
+            in results.values()
+        ]
+
+
+        models_agree = (
+            len(set(sentiments)) == 1
+        )
+
+
+        if models_agree:
+
+            agreement = {
+                "agree": True,
+                "message":
+                    f"All three models predict "
+                    f"{sentiments[0].lower()} sentiment."
+            }
+
+        else:
+
+            positive_models = [
+
+                result["model"]
+
+                for result
+                in results.values()
+
+                if result["sentiment"]
+                == "Positive"
+            ]
+
+
+            negative_models = [
+
+                result["model"]
+
+                for result
+                in results.values()
+
+                if result["sentiment"]
+                == "Negative"
+            ]
+
+
+            agreement = {
+
+                "agree":
+                    False,
+
+                "positive_models":
+                    positive_models,
+
+                "negative_models":
+                    negative_models,
+
+                "message":
+                    "The models disagree on this input."
+
+            }
+
+
+        return jsonify({
+
+            "text":
+                text,
+
+            "results":
+                results,
+
+            "agreement":
+                agreement,
+
+            "analysis": {
+
+                "original":
+                    text,
+
+                "cleaned":
+                    cleaned,
+
+                "tokens":
+                    build_token_data(
+                        token_ids
+                    ),
+
+                "token_count":
+                    len(token_ids),
+
+                "sequence_length":
+                    MAX_LENGTH
+
+            }
+
+        })
+
+
+    except Exception as error:
+
+        print(
+            "Comparison error:",
+            error
+        )
+
+        return jsonify({
+            "error":
+                "The models could not process this text."
+        }), 500
+
+
+# ============================================================
+# LEGACY PREDICTION ROUTE
+#
+# Keeps older frontend/API calls working while V3 is developed.
+# Defaults to GRU because it achieved the best standard
+# IMDb test accuracy in the V3 experiment.
+# ============================================================
+
+@app.route(
+    "/predict",
+    methods=["POST"]
+)
+def predict_legacy():
+
+    text, error = get_request_text()
+
+    if error:
+
+        return error
+
+
+    try:
+
+        (
+            cleaned,
+            token_ids,
+            padded
+        ) = preprocess_text(text)
+
+
+        result = run_model(
+            "gru",
+            padded
+        )
+
+
+        # Compatibility with V2 frontend
+        result["confidence"] = max(
+            result["positive_score"],
+            result["negative_score"]
+        )
+
+        result["positive_probability"] = (
+            result["positive_score"]
+        )
+
+        result["negative_probability"] = (
+            result["negative_score"]
+        )
+
+
+        result["analysis"] = {
+
+            "original":
+                text,
+
+            "cleaned":
+                cleaned,
+
+            "tokens":
+                build_token_data(
+                    token_ids
+                ),
+
+            "token_count":
+                len(token_ids),
+
+            "sequence_length":
+                MAX_LENGTH
+
+        }
+
+
+        return jsonify(
+            result
+        )
+
+
+    except Exception as error:
+
+        print(
+            "Legacy prediction error:",
+            error
+        )
+
+        return jsonify({
+            "error":
+                "The model could not process this text."
+        }), 500
+
+
+# ============================================================
+# 404
 # ============================================================
 
 @app.errorhandler(404)
 def not_found(error):
 
-    return jsonify(
-        {
-            "error":
-                "Route not found."
-        }
-    ), 404
+    return jsonify({
+        "error":
+            "Route not found."
+    }), 404
 
 
 # ============================================================
 # LOCAL DEVELOPMENT
-#
-# Vercel imports the Flask `app` object directly.
-# Therefore this block runs locally but not as the Vercel
-# server entry point.
 # ============================================================
 
 if __name__ == "__main__":
